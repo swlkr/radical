@@ -1,0 +1,28 @@
+PATH
+  remote: .
+  specs:
+    radical (1.0.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    minitest (5.14.2)
+    rake (13.0.3)
+    sorbet (0.5.9307)
+      sorbet-static (= 0.5.9307)
+    sorbet-runtime (0.5.9307)
+    sorbet-static (0.5.9307-x86_64-linux)
+
+PLATFORMS
+  x86_64-darwin-20
+  x86_64-linux
+
+DEPENDENCIES
+  minitest
+  radical!
+  rake
+  sorbet
+  sorbet-runtime
+
+BUNDLED WITH
+   2.2.27
