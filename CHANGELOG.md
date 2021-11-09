@@ -6,4 +6,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## [Unreleased]
 
 - Very basic understanding of how much memory it takes for a basic ruby app
-- Start to integrate
+- Start to integrate controllers and routing
+- Add url params support to router
+- Simple (not efficient) loop through routes and compare regex routing
