@@ -10,6 +10,8 @@ class RadicalTest < Minitest::Test
     @app = App.new do
       get '/', to: 'home#index'
       get '/todos', to: 'todos#index'
+      get '/todos/:id/edit', to: 'todos#edit'
+      get '/todo-items/new', to: 'todo_items#new'
     end
   end
 
@@ -36,6 +38,30 @@ class RadicalTest < Minitest::Test
     actual = @app.call(
       {
         'PATH_INFO' => '/todos',
+        'REQUEST_METHOD' => 'GET'
+      }
+    )
+
+    assert_equal expected, actual
+  end
+
+  def test_routes_to_long_controller
+    expected = [200, { 'Content-Type' => 'text/plain' }, ['todo_items_controller']]
+    actual = @app.call(
+      {
+        'PATH_INFO' => '/todo-items/new',
+        'REQUEST_METHOD' => 'GET'
+      }
+    )
+
+    assert_equal expected, actual
+  end
+
+  def test_params
+    expected = [200, { 'Content-Type' => 'text/plain' }, ['todos#edit id: 2']]
+    actual = @app.call(
+      {
+        'PATH_INFO' => '/todos/2/edit',
         'REQUEST_METHOD' => 'GET'
       }
     )

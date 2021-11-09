@@ -35,7 +35,7 @@ class Controller
   end
 
   def params
-    request.params
+    @env[:params]
   end
 
   def render(options = { status: 200, headers: { 'Content-Type' => 'text/plain' } })
