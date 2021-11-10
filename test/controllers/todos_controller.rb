@@ -1,3 +1,5 @@
+require 'radical'
+
 class TodosController < Controller
   def index
     render plain: 'todos'

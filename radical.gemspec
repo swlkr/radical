@@ -31,7 +31,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'minitest'
+  spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'sorbet'
   spec.add_development_dependency 'sorbet-runtime'
+
+  spec.add_dependency 'rack'
 end

@@ -1,18 +1,9 @@
 require 'minitest/autorun'
-require 'radical'
-
-Dir[File.join(__dir__, 'controllers', '*_controller.rb')].each do |file|
-  require file
-end
+require 'app'
 
 class RadicalTest < Minitest::Test
   def setup
-    @app = App.new do
-      get '/', to: 'home#index'
-      get '/todos', to: 'todos#index'
-      get '/todos/:id/edit', to: 'todos#edit'
-      get '/todo-items/new', to: 'todo_items#new'
-    end
+    @app = App.new
   end
 
   def teardown; end
