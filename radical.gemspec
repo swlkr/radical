@@ -33,8 +33,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'puma'
   spec.add_development_dependency 'rake'
-  spec.add_development_dependency 'sorbet'
-  spec.add_development_dependency 'sorbet-runtime'
+  spec.add_development_dependency 'sorbet', '0.5.9318'
 
+  spec.add_dependency 'sorbet-runtime', '0.5.9318'
   spec.add_dependency 'rack'
 end

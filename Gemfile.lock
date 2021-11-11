@@ -2,16 +2,23 @@ PATH
   remote: .
   specs:
     radical (1.0.0)
+      rack
+      sorbet-runtime (= 0.5.9318)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    minitest (5.14.2)
-    rake (13.0.3)
-    sorbet (0.5.9307)
-      sorbet-static (= 0.5.9307)
-    sorbet-runtime (0.5.9307)
-    sorbet-static (0.5.9307-x86_64-linux)
+    minitest (5.14.4)
+    nio4r (2.5.8)
+    puma (5.5.2)
+      nio4r (~> 2.0)
+    rack (2.2.3)
+    rake (13.0.6)
+    sorbet (0.5.9318)
+      sorbet-static (= 0.5.9318)
+    sorbet-runtime (0.5.9318)
+    sorbet-static (0.5.9318-universal-darwin-20)
+    sorbet-static (0.5.9318-x86_64-linux)
 
 PLATFORMS
   x86_64-darwin-20
@@ -19,10 +26,10 @@ PLATFORMS
 
 DEPENDENCIES
   minitest
+  puma
   radical!
   rake
-  sorbet
-  sorbet-runtime
+  sorbet (= 0.5.9318)
 
 BUNDLED WITH
    2.2.27
