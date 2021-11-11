@@ -51,7 +51,7 @@ class Router
   sig { params(verb: String, path: String, to: String).void }
   def add_route(verb, path, to)
     controller, method = to.split('#')
-    controller = controller.split('_').map(&:capitalize).join
+    controller = controller&.split('_')&.map(&:capitalize)&.join
 
     path = Regexp.new("^#{path.gsub(/:(\w+)/, '(?<\1>[a-zA-Z0-9]+)')}$")
 
@@ -78,7 +78,18 @@ class Router
       raise "No controller with #{controller_name} found" unless controller
       raise "No action #{action} in #{klass} found" unless controller.respond_to?(action)
 
-      controller.public_send(action)
+      response = controller.public_send(action)
+
+      case response
+      when String
+        [200, { 'Content-Type' => 'text/plain' }, [response]]
+      when Symbol
+        controller.view(response)
+      when Array
+        response
+      else
+        not_found
+      end
     else
       not_found
     end

@@ -13,7 +13,7 @@ class RadicalTest < Minitest::Test
   end
 
   def test_returns_expected_status_code_from_route
-    expected = [200, { 'Content-Type' => 'text/plain' }, []]
+    expected = [404, { 'Content-Type' => 'text/plain' }, ['404 Not Found']]
     actual = @app.call(
       {
         'PATH_INFO' => '/',
