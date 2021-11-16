@@ -12,3 +12,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Bring in rack as a dependency in the gemspec
 - Actually make everything work with rack for real
 - Add an examples folder to test it out with real http requests!
+- Add very simple ERB views
+- Experiment with tilt

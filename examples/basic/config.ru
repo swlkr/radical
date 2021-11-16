@@ -1,4 +1,14 @@
 require 'puma'
-require_relative './app'
+require '../../lib/radical'
 
-run App.new
+class Home < Radical::Controller
+  def index
+    head :ok
+  end
+end
+
+class App < Radical::App
+  root Home
+end
+
+run App.new.freeze

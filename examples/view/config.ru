@@ -1,24 +1,23 @@
+require 'puma'
 require '../../lib/radical'
 
-class HomeController < Controller
+Radical::View.path '/var/app/examples/view'
+
+class Home < Radical::Controller
   def index
-    @page = 'index'
-
-    view :index
-  end
-
-  def about
-    @page = 'about'
-
-    :about
+    @page = 'home#index'
   end
 end
 
-class App < Radical
-  routes do
-    get '/', to: 'home#index'
-    get '/about', to: 'home#about'
+class About < Radical::Controller
+  def index
+    @page = 'about#index'
   end
 end
 
-run App.new
+class App < Radical::App
+  root Home
+  routes About
+end
+
+run App.new.freeze
