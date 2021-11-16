@@ -17,16 +17,14 @@ __Put this inside of the `config.ru`__
 ```rb
 require 'radical'
 
-class HomeController < Controller
+class Home < Radical::Controller
   def index
-    render plain: 'home#index'
+    plain 'home#index'
   end
 end
 
 class App < Radical
-  routes do
-    get '/', to: 'home#index'
-  end
+  root Home
 end
 
 run App.new
@@ -43,15 +41,10 @@ gem 'radical'
 gem 'puma'
 ```
 
-__Install the gems__
+__Install the gems and start the server__
 
 ```sh
-bundle install
-```
-
-__Start the server__
-
-```sh
+bundle
 rackup
 ```
 

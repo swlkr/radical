@@ -14,3 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Add an examples folder to test it out with real http requests!
 - Add very simple ERB views
 - Experiment with tilt
+- Better view stuff, no tilt yet
+- Use Rack::Request and Rack::Response
+- Automatically render view from controller if a Rack::Response isn't returned
+- Update tests
+- Experiment with a module based mvc thing, didn't pan out
+- Only allow resource routes, custom method names will not be found
