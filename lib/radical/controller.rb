@@ -32,9 +32,13 @@ module Radical
     sig { params(name: String).returns(String) }
     def view(name)
       dir = self.class.to_s.gsub(/([A-Z])/, '_\1')[1..-1].downcase
-      view = View.compiled(dir, name)
 
-      view&.result(binding)
+      View.render(dir, name, binding)
+    end
+
+    sig { params(path: String).void }
+    def self.prepend_view_path(path)
+      Radical::View.path path
     end
   end
 end

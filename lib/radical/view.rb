@@ -20,6 +20,10 @@ module Radical
       def path(path = nil, test = Env.test?)
         @_views_path = path || ((test ? 'test' : '') + __dir__)
       end
+
+      def render(dir, name, binding)
+        View.compiled(dir, name)&.result(binding)
+      end
     end
   end
 end

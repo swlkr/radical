@@ -1,15 +1,16 @@
-require 'puma'
 require '../../lib/radical'
 
-Radical::View.path '/var/app/examples/view'
+class Controller < Radical::Controller
+  prepend_view_path '/var/app/examples/view'
+end
 
-class Home < Radical::Controller
+class Home < Controller
   def index
     @page = 'home#index'
   end
 end
 
-class About < Radical::Controller
+class About < Controller
   def index
     @page = 'about#index'
   end
