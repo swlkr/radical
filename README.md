@@ -48,7 +48,7 @@ bundle
 rackup
 ```
 
-__Test it out___
+__Test it out__
 
 ```sh
 curl localhost:9292
