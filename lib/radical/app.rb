@@ -50,7 +50,7 @@ module Radical
 
         @app ||= Rack::Builder.app do
           use Rack::CommonLogger
-          use Rack::ShowExceptions if e.production?
+          use Rack::ShowExceptions if e.development?
           use Rack::MethodOverride
           use Rack::ContentLength
           use Rack::Deflater
