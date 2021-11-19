@@ -21,12 +21,10 @@ require_relative 'env'
 #
 # Dispatches to:
 #
-# module Home
-#   class Controller < Radical::Controller
-#     # GET /
-#     def index
-#       head :ok
-#     end
+# class Controller < Radical::Controller
+#   # GET /
+#   def index
+#     head :ok
 #   end
 # end
 module Radical
