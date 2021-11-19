@@ -21,4 +21,4 @@ class App < Radical::App
   routes About
 end
 
-run App.new.freeze
+run App

@@ -1,4 +1,5 @@
 require 'rack/request'
+require 'rack/builder'
 
 require_relative 'router'
 require_relative 'env'
@@ -11,8 +12,7 @@ require_relative 'env'
 #   root Home
 # end
 #
-# app = App.new
-# app.call(
+# App.call(
 #   {
 #     'PATH_INFO' => '/',
 #     'REQUEST_METHOD' => 'GET'
@@ -31,31 +31,46 @@ require_relative 'env'
 # end
 module Radical
   class App
-    class << self
-      attr_accessor :router
+    @app = nil
 
+    class << self
       def root(klass)
-        @router ||= Router.new
-        @router.add_root(klass)
+        router.add_root(klass)
       end
 
       def routes(klass)
-        @router ||= Router.new
-        @router.add_routes(klass)
+        router.add_routes(klass)
       end
 
       def env
         Env
       end
-    end
 
-    def call(rack_env)
-      return Rack::Response.new(nil, 404).finish if self.class.router.nil?
+      def app
+        r = router
+        e = env
 
-      request = Rack::Request.new(rack_env)
-      response = self.class.router.route(request)
+        @app ||= Rack::Builder.app do
+          use Rack::CommonLogger
+          use Rack::ShowExceptions if e.production?
+          use Rack::MethodOverride
+          use Rack::ContentLength
+          use Rack::Deflater
+          use Rack::ETag
+          use Rack::Head
+          use Rack::ContentType
 
-      response.finish
+          run lambda { |env| r.route(Rack::Request.new(env)).finish }
+        end
+      end
+
+      def router
+        @router ||= Router.new
+      end
+
+      def call(env)
+        app.call(env)
+      end
     end
   end
 end
