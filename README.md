@@ -27,7 +27,7 @@ class App < Radical
   root Home
 end
 
-run App.new
+run App
 ```
 
 __Put this inside of the Gemfile:__
