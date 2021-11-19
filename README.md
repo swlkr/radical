@@ -23,7 +23,7 @@ class Home < Radical::Controller
   end
 end
 
-class App < Radical
+class App < Radical::App
   root Home
 end
 
