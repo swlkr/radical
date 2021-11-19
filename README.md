@@ -45,7 +45,7 @@ __Install the gems and start the server__
 
 ```sh
 bundle
-rackup
+puma
 ```
 
 __Test it out__
