@@ -50,14 +50,12 @@ module Radical
 
     sig { params(klass: Class).void }
     def add_root(klass)
-      return unless klass.method_defined?(:index)
-
-      @routes['GET'] << [/^\/$/, [klass, 'index']]
+      add_routes(klass, prefix: '')
     end
 
-    sig { params(klass: Class).void }
-    def add_routes(klass)
-      prefix = klass.to_s.gsub(/([A-Z])/, '_\1')[1..-1].downcase
+    sig { params(klass: Class, prefix: T.nilable(String)).void }
+    def add_routes(klass, prefix: nil)
+      prefix ||= klass.to_s.gsub(/([A-Z])/, '_\1')[1..-1].downcase
 
       ACTIONS.each do |method, http_method, suffix|
         next unless klass.method_defined?(method)
