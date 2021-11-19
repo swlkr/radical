@@ -11,4 +11,4 @@ class App < Radical::App
   root Home
 end
 
-run App.new.freeze
+run App
