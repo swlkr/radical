@@ -20,3 +20,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Update tests
 - Experiment with a module based mvc thing, didn't pan out
 - Only allow resource routes, custom method names will not be found
+- Add a bunch of rack middleware
+- Move call to class
+- Use Rack::Test
