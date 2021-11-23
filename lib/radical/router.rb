@@ -77,7 +77,7 @@ module Radical
         next unless klass.method_defined?(method)
 
         path = "/#{prefix}#{suffix}"
-        path = Regexp.new("^#{path.gsub(/:(\w+)/, '(?<\1>[a-zA-Z0-9]+)')}$")
+        path = Regexp.new("^#{path.gsub(/:(\w+)/, '(?<\1>[a-zA-Z0-9_]+)')}$")
 
         @routes[http_method] << [path, [klass, method]]
       end

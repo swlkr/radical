@@ -35,4 +35,11 @@ class RadicalTest < Minitest::Test
     assert last_response.ok?
     assert_equal 'todos#edit { id: 2 }', last_response.body
   end
+
+  def test_params_with_underscores
+    get '/todos/abc_xyz/edit'
+
+    assert last_response.ok?
+    assert_equal 'todos#edit { id: abc_xyz }', last_response.body
+  end
 end

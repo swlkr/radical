@@ -14,6 +14,6 @@ class TestRouter < Minitest::Test
   def test_adds_resource_routes_when_methods_defined
     @router.add_routes(Whatever)
 
-    assert_equal [[/^\/whatever$/, [Whatever, :index]], [/^\/whatever\/(?<id>[a-zA-Z0-9]+)\/edit$/, [Whatever, :edit]]], @router.routes['GET']
+    assert_equal [[/^\/whatever$/, [Whatever, :index]], [/^\/whatever\/(?<id>[a-zA-Z0-9_]+)\/edit$/, [Whatever, :edit]]], @router.routes['GET']
   end
 end
