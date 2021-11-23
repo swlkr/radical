@@ -18,7 +18,7 @@ end
 
 class App < Radical::App
   root Home
-  routes About
+  resources About
 end
 
 run App

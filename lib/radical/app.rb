@@ -36,7 +36,11 @@ module Radical
         router.add_root(klass)
       end
 
-      def routes(klass)
+      def resource(klass)
+        router.add_routes(klass, actions: Router::PREFIX_ACTIONS)
+      end
+
+      def resources(klass)
         router.add_routes(klass)
       end
 
@@ -45,12 +49,12 @@ module Radical
       end
 
       def app
-        r = router
-        e = env
+        router = self.router
+        env = self.env
 
         @app ||= Rack::Builder.app do
           use Rack::CommonLogger
-          use Rack::ShowExceptions if e.development?
+          use Rack::ShowExceptions if env.development?
           use Rack::MethodOverride
           use Rack::ContentLength
           use Rack::Deflater
@@ -58,7 +62,7 @@ module Radical
           use Rack::Head
           use Rack::ContentType
 
-          run lambda { |env| r.route(Rack::Request.new(env)).finish }
+          run lambda { |rack_env| router.route(Rack::Request.new(rack_env)).finish }
         end
       end
 

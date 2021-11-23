@@ -43,6 +43,13 @@ module Radical
       [:destroy, 'DELETE', '/:id']
     ].freeze
 
+    PREFIX_ACTIONS = [
+      [:show, 'GET', ''],
+      [:edit, 'GET', '/edit'],
+      [:update, 'PUT', ''],
+      [:destroy, 'DELETE', '']
+    ].freeze
+
     attr_accessor :routes
 
     sig { void }
@@ -50,16 +57,21 @@ module Radical
       @routes = Hash.new { |hash, key| hash[key] = [] }
     end
 
+    sig { params(klass: Class).returns(String) }
+    def route_prefix(klass)
+      klass.to_s.gsub(/([A-Z])/, '_\1')[1..-1].downcase
+    end
+
     sig { params(klass: Class).void }
     def add_root(klass)
       add_routes(klass, prefix: '')
     end
 
-    sig { params(klass: Class, prefix: T.nilable(String)).void }
-    def add_routes(klass, prefix: nil)
-      prefix ||= klass.to_s.gsub(/([A-Z])/, '_\1')[1..-1].downcase
+    sig { params(klass: Class, prefix: T.nilable(String), actions: Array).void }
+    def add_routes(klass, prefix: nil, actions: ACTIONS)
+      prefix ||= route_prefix(klass)
 
-      ACTIONS.each do |method, http_method, suffix|
+      actions.each do |method, http_method, suffix|
         next unless klass.method_defined?(method)
 
         path = "/#{prefix}#{suffix}"
