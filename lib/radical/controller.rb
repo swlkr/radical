@@ -10,6 +10,7 @@ require_relative 'env'
 module Radical
   class Controller
     extend T::Sig
+
     sig { params(request: Rack::Request).void }
     def initialize(request)
       @request = request
