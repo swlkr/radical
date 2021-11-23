@@ -43,6 +43,8 @@ module Radical
       [:destroy, 'DELETE', '/:id']
     ].freeze
 
+    attr_accessor :routes
+
     sig { void }
     def initialize
       @routes = Hash.new { |hash, key| hash[key] = [] }
