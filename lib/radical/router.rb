@@ -40,6 +40,7 @@ module Radical
       [:create, 'POST', ''],
       [:edit, 'GET', '/:id/edit'],
       [:update, 'PUT', '/:id'],
+      [:update, 'PATCH', '/:id'],
       [:destroy, 'DELETE', '/:id']
     ].freeze
 
@@ -47,6 +48,7 @@ module Radical
       [:show, 'GET', ''],
       [:edit, 'GET', '/edit'],
       [:update, 'PUT', ''],
+      [:update, 'PATCH', ''],
       [:destroy, 'DELETE', '']
     ].freeze
 
