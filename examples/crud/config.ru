@@ -3,37 +3,37 @@ require '../../lib/radical'
 class Todos < Radical::Controller
   # GET /todos
   def index
-    plain 'todos#index'
+    plain 'GET /todos'
   end
 
   # GET /todos/:id
   def show
-    plain 'todos#show'
+    plain "GET /todos/#{params['id']}"
   end
 
   # GET /todos/new
   def new
-    plain 'todos#new'
+    plain 'GET /todos/new'
   end
 
   # POST /todos
   def create
-    plain 'todos#create'
+    plain 'POST /todos'
   end
 
   # GET /todos/:id/edit
   def edit
-    plain 'todos#edit'
+    plain "GET /todos/#{params['id']}/edit"
   end
 
   # PUT or PATCH /todos/:id
   def update
-    plain 'todos#update'
+    plain "PUT/PATCH /todos/#{params['id']}"
   end
 
   # DELETE /todos/:id
   def destroy
-    plain 'todos#destroy'
+    plain "DELETE /todos/#{params['id']}"
   end
 end
 
