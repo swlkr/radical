@@ -19,7 +19,7 @@ require 'radical'
 
 class Home < Radical::Controller
   def index
-    plain 'home#index'
+    plain '/'
   end
 end
 
@@ -30,21 +30,10 @@ end
 run App
 ```
 
-__Put this inside of the Gemfile:__
-
-```rb
-source "https://rubygems.org"
-
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
-
-gem 'radical'
-gem 'puma'
-```
-
 __Install the gems and start the server__
 
 ```sh
-bundle
+gem install radical puma
 puma
 ```
 
@@ -52,5 +41,5 @@ __Test it out__
 
 ```sh
 curl localhost:9292
-# => home#index
+# => /
 ```

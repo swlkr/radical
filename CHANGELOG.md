@@ -23,3 +23,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Add a bunch of rack middleware
 - Move call to class
 - Use Rack::Test
+- Rename routes to resources; add resource method
