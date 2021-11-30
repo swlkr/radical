@@ -1,4 +1,3 @@
-require 'puma'
 require '../../lib/radical'
 
 class Home < Radical::Controller
