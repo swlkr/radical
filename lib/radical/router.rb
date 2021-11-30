@@ -35,8 +35,8 @@ module Radical
 
     ACTIONS = [
       [:index, 'GET', ''],
-      [:show, 'GET', '/:id'],
       [:new, 'GET', '/new'],
+      [:show, 'GET', '/:id'],
       [:create, 'POST', ''],
       [:edit, 'GET', '/:id/edit'],
       [:update, 'PUT', '/:id'],

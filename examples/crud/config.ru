@@ -8,7 +8,7 @@ class Todos < Radical::Controller
 
   # GET /todos/:id
   def show
-    plain "GET /todos/#{params['id']}"
+    plain "GET /todos id:#{params['id']}"
   end
 
   # GET /todos/new
