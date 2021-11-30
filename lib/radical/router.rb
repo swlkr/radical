@@ -44,7 +44,7 @@ module Radical
       [:destroy, 'DELETE', '/:id']
     ].freeze
 
-    PREFIX_ACTIONS = [
+    RESOURCE_ACTIONS = [
       [:show, 'GET', ''],
       [:edit, 'GET', '/edit'],
       [:update, 'PUT', ''],
@@ -60,26 +60,38 @@ module Radical
     end
 
     sig { params(klass: Class).returns(String) }
-    def route_prefix(klass)
+    def route_name(klass)
       klass.to_s.gsub(/([A-Z])/, '_\1')[1..-1].downcase
+    end
+
+    sig { params(classes: T::Array[Class]).returns(String) }
+    def route_prefix(classes)
+      classes.map { |c| route_name(c) }.map { |n| "#{n}/:#{n}_id" }.join('/')
     end
 
     sig { params(klass: Class).void }
     def add_root(klass)
-      add_routes(klass, prefix: '')
+      add_actions(klass, name: '')
     end
 
-    sig { params(klass: Class, prefix: T.nilable(String), actions: Array).void }
-    def add_routes(klass, prefix: nil, actions: ACTIONS)
-      prefix ||= route_prefix(klass)
+    sig { params(klass: Class, name: T.nilable(String), prefix: T.nilable(String), actions: Array).void }
+    def add_actions(klass, name: nil, prefix: nil, actions: ACTIONS)
+      name ||= route_name(klass)
 
       actions.each do |method, http_method, suffix|
         next unless klass.method_defined?(method)
 
-        path = "/#{prefix}#{suffix}"
+        path = "/#{prefix}#{name}#{suffix}"
         path = Regexp.new("^#{path.gsub(/:(\w+)/, '(?<\1>[a-zA-Z0-9_]+)')}$")
 
         @routes[http_method] << [path, [klass, method]]
+      end
+    end
+
+    sig { params(classes: T::Array[Class], prefix: T.nilable(String), actions: Array).void }
+    def add_routes(classes, prefix: nil, actions: ACTIONS)
+      classes.each do |klass|
+        add_actions(klass, prefix: prefix, actions: actions)
       end
     end
 

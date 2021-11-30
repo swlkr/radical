@@ -37,11 +37,19 @@ module Radical
       end
 
       def resource(klass)
-        router.add_routes(klass, actions: Router::PREFIX_ACTIONS)
+        router.add_actions(klass, actions: Router::RESOURCE_ACTIONS)
       end
 
-      def resources(klass)
-        router.add_routes(klass)
+      def resources(*classes, &block)
+        prefix = "#{router.route_prefix(@parents)}/" if instance_variable_defined?(:@parents)
+
+        router.add_routes(classes, prefix: prefix)
+
+        return unless block
+
+        @parents ||= []
+        @parents << classes.last
+        block.call
       end
 
       def env

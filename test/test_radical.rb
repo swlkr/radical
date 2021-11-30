@@ -42,4 +42,11 @@ class RadicalTest < Minitest::Test
     assert last_response.ok?
     assert_equal 'todos#edit { id: abc_xyz }', last_response.body
   end
+
+  def test_nested_routes
+    get '/c/1/d/2'
+
+    assert last_response.ok?
+    assert_equal 'c:1, d:2', last_response.body
+  end
 end
