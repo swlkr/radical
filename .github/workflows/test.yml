@@ -16,4 +16,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run tests
-      run: docker run --rm -it -v $(pwd):/var/app radical
+      run: docker run --rm -v $(pwd):/var/app radical
