@@ -1,18 +1,22 @@
 # radical
 
-__A rails inspired web framework__
+A rails inspired ruby web framework
 
-## Quickstart
+# Learning
 
-__Create a directory with a `config.ru` and a `Gemfile` file inside of it__
+Check out the `examples/` folder for some ideas on how to get started
+
+# Quickstart
+
+Create a directory with a `config.ru` and a `Gemfile` file inside of it
 
 ```sh
-mkdir rad
-cd rad
+mkdir your_project
+cd your_project
 touch config.ru Gemfile
 ```
 
-__Put this inside of the `config.ru`__
+Put this inside of the `config.ru`
 
 ```rb
 require 'radical'
@@ -30,14 +34,14 @@ end
 run App
 ```
 
-__Install the gems and start the server__
+Install the gems and start the server
 
 ```sh
 gem install radical puma
 puma
 ```
 
-__Test it out__
+Test it out
 
 ```sh
 curl localhost:9292
