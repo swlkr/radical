@@ -1,0 +1,26 @@
+<a href="<%= new_todos_path %>">New todo</a>
+
+<table>
+  <thead>
+    <th>id</th>
+    <th>name</th>
+    <th>done_at</th>
+    <th></th>
+  </thead>
+  <tbody>
+    <% @todos.each do |todo| %>
+      <tr>
+        <td><%= todo.id %></td>
+        <td><%= todo.name %></td>
+        <td><%= todo.done_at %></td>
+        <td>
+          <a href="<%= todos_path(todo) %>">show</a>
+          <a href="<%= edit_todos_path(todo) %>">edit</a>
+          <%== form model: todo, method: :delete do |f| %>
+            <%== f.submit 'delete' %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

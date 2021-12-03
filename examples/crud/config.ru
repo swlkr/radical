@@ -1,39 +1,79 @@
 require '../../lib/radical'
 
-class Todos < Radical::Controller
+class Controller < Radical::Controller
+  prepend_view_path '/var/app/examples/crud'
+  layout 'layout'
+end
+
+class Model < Radical::Model
+  database 'test.sqlite3'
+  prepend_migrations_path '/var/app/examples/crud'
+end
+
+Radical::Database.migrate!
+# Radical::Database.rollback!
+
+class Todo < Model
+  table 'todos'
+end
+
+class Todos < Controller
   # GET /todos
   def index
-    plain 'GET /todos'
+    @todos = Todo.all
   end
 
   # GET /todos/:id
-  def show
-    plain "GET /todos id:#{params['id']}"
-  end
+  def show; end
 
   # GET /todos/new
   def new
-    plain 'GET /todos/new'
+    @todo = Todo.new
   end
 
   # POST /todos
   def create
-    plain 'POST /todos'
+    @todo = Todo.new(todo_params)
+
+    if @todo.save
+      flash[:success] = 'Todo saved successfully'
+      redirect todos_path
+    else
+      view :new
+    end
   end
 
   # GET /todos/:id/edit
-  def edit
-    plain "GET /todos/#{params['id']}/edit"
-  end
+  def edit; end
 
   # PUT or PATCH /todos/:id
   def update
-    plain "PUT/PATCH /todos/#{params['id']}"
+    if todo.update(todo_params)
+      redirect todos_path
+    else
+      view :edit
+    end
   end
 
   # DELETE /todos/:id
   def destroy
-    plain "DELETE /todos/#{params['id']}"
+    if todo.delete
+      flash[:success] = 'Todo deleted successfully'
+    else
+      flash[:error] = 'Todo could not be deleted'
+    end
+
+    redirect todos_path
+  end
+
+  private
+
+  def todo_params
+    params['todos'].slice('name')
+  end
+
+  def todo
+    @todo ||= Todo.find(params['id'])
   end
 end
 
