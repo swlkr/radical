@@ -38,6 +38,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'erubi', '~> 1.10'
   spec.add_dependency 'rack', '~> 2.2'
+  spec.add_dependency 'rack_csrf', '~> 2.6'
+  spec.add_dependency 'rack-flash3', '~> 1.0'
   spec.add_dependency 'sorbet-runtime', '~> 0.5'
+  spec.add_dependency 'sqlite3', '~> 1.4'
   spec.add_dependency 'tilt', '~> 2.0'
 end

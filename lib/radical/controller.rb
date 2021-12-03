@@ -5,6 +5,7 @@ require 'rack/response'
 require 'sorbet-runtime'
 require_relative 'view'
 require_relative 'env'
+require_relative 'form'
 
 module Radical
   class Controller
@@ -89,16 +90,55 @@ module Radical
       @request.params
     end
 
-    sig { params(name: String).returns(String) }
+    sig { params(name: T.any(String, Symbol)).returns(String) }
     def view(name)
-      dir = self.class.to_s.gsub(/([A-Z])/, '_\1')[1..-1].downcase
-
-      View.render(dir, name, binding)
+      View.render(self.class.route_name, name, self)
     end
 
-    sig { params(path: String).void }
-    def self.prepend_view_path(path)
-      Radical::View.path path
+    sig { params(name: T.any(String, Symbol)).returns(String) }
+    def partial(name)
+      View.render(self.class.route_name, "_#{name}", self, layout: false)
+    end
+
+    sig { params(options: Hash, block: T.proc.void).returns(String) }
+    def form(options, &block)
+      f = Form.new(options, self)
+
+      capture(block) do
+        emit f.open_tag
+        emit f.csrf_tag
+        emit f.rack_override_tag
+        yield f
+        emit f.close_tag
+      end
+    end
+
+    sig { params(to: T.any(Symbol, String)).returns(Rack::Response) }
+    def redirect(to)
+      to = self.class.action_to_url(to) if to.is_a?(Symbol)
+
+      Rack::Response.new(nil, 302, { 'Location' => to })
+    end
+
+    def flash
+      @request.env['rack.session']['__FLASH__']
+    end
+
+    def session
+      @request.env['rack.session']
+    end
+
+    private
+
+    def emit(tag)
+      @output = '' if @output.nil?
+      @output << tag.to_s
+    end
+
+    def capture(block)
+      @output = eval('_buf', block.binding)
+      yield
+      @output
     end
   end
 end
