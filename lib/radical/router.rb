@@ -79,6 +79,28 @@ module Radical
         path = "/#{prefix}#{name}#{suffix}"
         path = Regexp.new("^#{path.gsub(/:(\w+)/, '(?<\1>[a-zA-Z0-9_]+)')}$")
 
+        if %i[index create show update destroy].include?(method) && !klass.method_defined?(:"#{klass.route_name}_path")
+          klass.define_method :"#{klass.route_name}_path" do |obj = nil|
+            if obj.is_a?(Model)
+              "/#{klass.route_name}/#{obj.id}"
+            else
+              "/#{klass.route_name}"
+            end
+          end
+        end
+
+        if method == :new
+          klass.define_method :"new_#{klass.route_name}_path" do
+            "/#{klass.route_name}/new"
+          end
+        end
+
+        if method == :edit
+          klass.define_method :"edit_#{klass.route_name}_path" do |obj|
+            "/#{klass.route_name}/#{obj.id}/edit"
+          end
+        end
+
         @routes[http_method] << [path, [klass, method]]
       end
     end
