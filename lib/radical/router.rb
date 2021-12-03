@@ -59,14 +59,9 @@ module Radical
       @routes = Hash.new { |hash, key| hash[key] = [] }
     end
 
-    sig { params(klass: Class).returns(String) }
-    def route_name(klass)
-      klass.to_s.gsub(/([A-Z])/, '_\1')[1..-1].downcase
-    end
-
     sig { params(classes: T::Array[Class]).returns(String) }
     def route_prefix(classes)
-      classes.map { |c| route_name(c) }.map { |n| "#{n}/:#{n}_id" }.join('/')
+      classes.map(&:route_name).map { |n| "#{n}/:#{n}_id" }.join('/')
     end
 
     sig { params(klass: Class).void }
@@ -76,7 +71,7 @@ module Radical
 
     sig { params(klass: Class, name: T.nilable(String), prefix: T.nilable(String), actions: Array).void }
     def add_actions(klass, name: nil, prefix: nil, actions: ACTIONS)
-      name ||= route_name(klass)
+      name ||= klass.route_name
 
       actions.each do |method, http_method, suffix|
         next unless klass.method_defined?(method)

@@ -10,6 +10,65 @@ module Radical
   class Controller
     extend T::Sig
 
+    attr_accessor :request
+
+    class << self
+      extend T::Sig
+
+      attr_accessor :skip_csrf_actions
+
+      sig { params(path: String).void }
+      def prepend_view_path(path)
+        View.path path
+      end
+
+      def layout(name)
+        View.layout name
+      end
+
+      sig { returns(String) }
+      def route_name
+        to_s.split('::').last.gsub(/Controller$/, '').gsub(/([A-Z])/, '_\1')[1..-1].downcase
+      end
+
+      sig { params(actions: Symbol).void }
+      def skip_csrf(*actions)
+        @skip_csrf_actions = [] if @skip_csrf_actions.nil?
+
+        actions.each do |action|
+          @skip_csrf_actions << "#{action_to_http_method(action)}:#{action_to_url(action)}"
+        end
+      end
+
+      sig { params(action: Symbol).returns(String) }
+      def action_to_url(action)
+        case action
+        when :index, :create
+          "/#{route_name}"
+        when :show, :update, :destroy
+          "/#{route_name}/:id"
+        when :new
+          "/#{route_name}/new"
+        when :edit
+          "/#{route_name}/:id/edit"
+        end
+      end
+
+      sig { params(action: Symbol).returns(String) }
+      def action_to_http_method(action)
+        case action
+        when :index, :show, :new, :edit
+          'GET'
+        when :create
+          'POST'
+        when :update
+          'PATCH'
+        when :destroy
+          'DELETE'
+        end
+      end
+    end
+
     sig { params(request: Rack::Request).void }
     def initialize(request)
       @request = request
@@ -20,6 +79,7 @@ module Radical
       Rack::Response.new(nil, Rack::Utils::SYMBOL_TO_STATUS_CODE[status])
     end
 
+    sig { params(body: String).returns(Rack::Response) }
     def plain(body)
       Rack::Response.new(body, 200, { 'Content-Type' => 'text/plain' })
     end
