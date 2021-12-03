@@ -4,7 +4,7 @@ A rails inspired ruby web framework
 
 # Learning
 
-Check out the `examples/` folder for some ideas on how to get started
+Check out the `examples/` folder for some ideas on how to get started and when  you're ready, check the `docs/` folder for more details.
 
 # Quickstart
 
