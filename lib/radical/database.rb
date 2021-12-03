@@ -4,7 +4,24 @@ require_relative 'table'
 module Radical
   class Database
     class << self
-      attr_accessor :connection, :migrations_path
+      attr_writer :connection_string
+      attr_accessor :migrations_path
+
+      def connection_string
+        @connection_string || ENV['DATABASE_URL']
+      end
+
+      def connection
+        conn = SQLite3::Database.new(connection_string)
+        conn.results_as_hash = true
+        conn.type_translation = true
+
+        @connection ||= conn
+      end
+
+      def prepend_migrations_path(path)
+        self.migrations_path = path
+      end
 
       def db
         connection

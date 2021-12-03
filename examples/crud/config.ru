@@ -1,17 +1,14 @@
 require '../../lib/radical'
 
+Radical::Database.prepend_migrations_path '/var/app/examples/crud'
+Radical::Database.migrate!
+
 class Controller < Radical::Controller
   prepend_view_path '/var/app/examples/crud'
   layout 'layout'
 end
 
-class Model < Radical::Model
-  database 'test.sqlite3'
-  prepend_migrations_path '/var/app/examples/crud'
-end
-
-Radical::Database.migrate!
-# Radical::Database.rollback!
+class Model < Radical::Model; end
 
 class Todo < Model
   table 'todos'

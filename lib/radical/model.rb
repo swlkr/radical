@@ -7,17 +7,6 @@ module Radical
     class << self
       attr_accessor :table_name
 
-      def database(name)
-        conn = SQLite3::Database.new name
-        conn.results_as_hash = true
-        conn.type_translation = true
-        Database.connection = conn
-      end
-
-      def prepend_migrations_path(path)
-        Database.migrations_path = path
-      end
-
       def db
         Database.connection
       end
