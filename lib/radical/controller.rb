@@ -1,5 +1,4 @@
 # typed: true
-require 'erb'
 require 'rack/utils'
 require 'rack/request'
 require 'rack/response'
