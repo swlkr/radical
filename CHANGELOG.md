@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
+- Move migration/connection string stuff to database
+
 # 1.0.2
 
 - Set default views / migrations paths
