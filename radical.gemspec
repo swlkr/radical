@@ -36,6 +36,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'sorbet', '~> 0.5'
 
+  spec.add_dependency 'erubi', '~> 1.10'
   spec.add_dependency 'rack', '~> 2.2'
   spec.add_dependency 'sorbet-runtime', '~> 0.5'
+  spec.add_dependency 'tilt', '~> 2.0'
 end
