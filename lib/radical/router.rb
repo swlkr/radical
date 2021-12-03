@@ -102,9 +102,6 @@ module Radical
 
       klass, method = route.last
 
-      # TODO: Fix this ??
-      request.env['rack.input'] = ''
-
       params.each do |k, v|
         request.update_param(k, v)
       end
