@@ -3,7 +3,7 @@
 Gem::Specification.new do |spec|
   spec.platform      = Gem::Platform::RUBY
   spec.name          = 'radical'
-  spec.version       = '1.0.0'
+  spec.version       = '1.0.1'
   spec.author        = 'Sean Walker'
   spec.email         = 'sean@swlkr.com'
 
