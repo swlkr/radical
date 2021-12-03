@@ -15,6 +15,9 @@ end
 class TodoItem < Radical::Controller
 end
 
+class TodoItemsController < Radical::Controller
+end
+
 class TestRouter < Minitest::Test
   def setup
     @router = Radical::Router.new
@@ -33,6 +36,10 @@ class TestRouter < Minitest::Test
   end
 
   def test_long_route_name
-    assert_equal 'todo_items', @router.route_name(TodoItems)
+    assert_equal 'todo_items', TodoItems.send(:route_name)
+  end
+
+  def test_long_route_name_with_controller_suffix
+    assert_equal 'todo_items', TodoItemsController.send(:route_name)
   end
 end
