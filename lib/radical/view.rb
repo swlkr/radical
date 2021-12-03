@@ -21,7 +21,7 @@ module Radical
       attr_accessor :_views_path, :_layout
 
       def view_path(dir, name)
-        filename = File.join(@_views_path, 'views', dir, "#{name}.erb")
+        filename = File.join(@_views_path || '.', 'views', dir, "#{name}.erb")
 
         raise "Could not find view file: #{filename}. You need to create it." unless File.exist?(filename)
 

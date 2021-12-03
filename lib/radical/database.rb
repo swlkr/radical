@@ -53,7 +53,7 @@ module Radical
       end
 
       def migrations
-        Dir[File.join(migrations_path, 'db', 'migrations', '*.rb')].sort
+        Dir[File.join(migrations_path || '.', 'db', 'migrations', '*.rb')].sort
       end
 
       def version(filename)

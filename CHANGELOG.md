@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
+# 1.0.2
+
+- Set default views / migrations paths
+
 # 1.0.1
 
 - Fix changelog link in gemspec
