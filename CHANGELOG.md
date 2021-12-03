@@ -25,3 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Use Rack::Test
 - Rename routes to resources; add resource method
 - Add nested resources, multi-argument resources
+- Use rack sessions, rack-csrf and rack-flash3
+- Add naive migrations
+- Add naive models
+- Add naive form helper
