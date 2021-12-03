@@ -1,5 +1,6 @@
-require 'rack/request'
-require 'rack/builder'
+require 'rack'
+require 'rack/flash'
+require 'rack/csrf'
 
 require_relative 'router'
 require_relative 'env'
@@ -29,8 +30,6 @@ require_relative 'env'
 # end
 module Radical
   class App
-    @app = nil
-
     class << self
       def root(klass)
         router.add_root(klass)
@@ -63,14 +62,32 @@ module Radical
         @app ||= Rack::Builder.app do
           use Rack::CommonLogger
           use Rack::ShowExceptions if env.development?
+          use Rack::Runtime
           use Rack::MethodOverride
           use Rack::ContentLength
           use Rack::Deflater
           use Rack::ETag
           use Rack::Head
+          use Rack::ConditionalGet
           use Rack::ContentType
+          use Rack::Session::Cookie, path: '/',
+                                     secret: ENV['SESSION_SECRET'],
+                                     http_only: true,
+                                     same_site: :lax,
+                                     secure: env.production?,
+                                     expire_after: 2_592_000 # 30 days
+          use Rack::Csrf, raise: env.development?, skip: router.routes.values.flatten.select { |a| a.is_a?(Class) }.uniq.map(&:skip_csrf_actions).flatten(1)
+          use Rack::Flash, sweep: true
 
-          run lambda { |rack_env| router.route(Rack::Request.new(rack_env)).finish }
+          run lambda { |rack_env|
+            begin
+              router.route(Rack::Request.new(rack_env)).finish
+            rescue ModelNotFound
+              raise unless env.production?
+
+              Rack::Response.new('404 Not Found', 404).finish
+            end
+          }
         end
       end
 
