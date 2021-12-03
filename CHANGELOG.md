@@ -3,7 +3,13 @@ All notable changes to this project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## [1.0.0]
+# [Unreleased]
+
+# 1.0.1
+
+- Fix changelog link in gemspec
+
+## 1.0.0
 
 - Very basic understanding of how much memory it takes for a basic ruby app
 - Start to integrate controllers and routing
@@ -29,7 +35,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Add naive migrations
 - Add naive models
 - Add naive form helper
-
-# [1.0.1]
-
-- Fix changelog link in gemspec
