@@ -2,6 +2,7 @@
 
 require 'sqlite3'
 require_relative 'table'
+require_relative 'migration'
 
 module Radical
   class Database
@@ -29,31 +30,38 @@ module Radical
         connection
       end
 
-      def migrate!
-        @migrate = true
+      def migration(file)
+        context = Module.new
+        context.class_eval(File.read(file), file)
+        const = context.constants.find do |constant|
+          context.const_get(constant).ancestors.include?(Radical::Migration)
+        end
 
+        context.const_get(const)
+      end
+
+      def migrate!
         db.execute 'create table if not exists radical_migrations ( version integer primary key )'
 
-        pending_migrations.each do |migration|
-          puts "Executing migration #{migration}"
-          sql = eval File.read(migration)
-          db.execute sql
-          db.execute 'insert into radical_migrations (version) values (?)', [version(migration)]
+        pending_migrations.each do |file|
+          puts "Executing migration #{file}"
+
+          v = version(file)
+
+          migration(file).migrate!(db: db, version: v)
         end
       end
 
       def rollback!
-        @rollback = true
-
         db.execute 'create table if not exists radical_migrations ( version integer primary key )'
 
-        migration = applied_migrations.last
+        file = applied_migrations.last
 
-        puts "Rolling back migration #{migration}"
+        puts "Rolling back migration #{file}"
 
-        sql = eval File.read(migration)
-        db.execute sql
-        db.execute 'delete from radical_migrations where version = ?', [version(migration)]
+        v = version(file)
+
+        migration(file).rollback!(db: db, version: v)
       end
 
       def applied_versions
@@ -77,34 +85,6 @@ module Radical
 
       def version(filename)
         filename.split(File::SEPARATOR).last.split('_').first.to_i
-      end
-
-      def migration(&block)
-        block.call
-      end
-
-      def change(&block)
-        @change = true
-
-        block.call
-      end
-
-      def up(&block)
-        block.call
-      end
-
-      def down(&block)
-        block.call
-      end
-
-      def create_table(name, &block)
-        return "drop table #{name}" if @change && @rollback
-
-        table = Table.new(name)
-
-        block.call(table)
-
-        "create table #{name} ( id integer primary key, #{table.columns.join(',')} )"
       end
     end
   end
