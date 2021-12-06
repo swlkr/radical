@@ -4,7 +4,7 @@ require 'rack'
 require 'rack/flash'
 require 'rack/csrf'
 
-require_relative 'router'
+require_relative 'routes'
 require_relative 'env'
 
 # The main entry point for a Radical application
@@ -33,24 +33,8 @@ require_relative 'env'
 module Radical
   class App
     class << self
-      def root(klass)
-        router.add_root(klass)
-      end
-
-      def resource(klass)
-        router.add_actions(klass, actions: Router::RESOURCE_ACTIONS)
-      end
-
-      def resources(*classes, &block)
-        prefix = "#{router.route_prefix(@parents)}/" if instance_variable_defined?(:@parents)
-
-        router.add_routes(classes, prefix: prefix)
-
-        return unless block
-
-        @parents ||= []
-        @parents << classes.last
-        block.call
+      def routes(route_class)
+        @routes ||= route_class
       end
 
       def env
@@ -58,7 +42,7 @@ module Radical
       end
 
       def app
-        router = self.router
+        router = @routes.router
         env = self.env
 
         @app ||= Rack::Builder.app do
@@ -91,10 +75,6 @@ module Radical
             end
           }
         end
-      end
-
-      def router
-        @router ||= Router.new
       end
 
       def call(env)
