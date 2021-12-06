@@ -6,8 +6,12 @@ class Home < Radical::Controller
   end
 end
 
+class Routes < Radical::Routes
+  root :Home
+end
+
 class App < Radical::App
-  root Home
+  routes Routes
 end
 
 run App

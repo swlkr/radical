@@ -27,8 +27,12 @@ class Home < Radical::Controller
   end
 end
 
-class App < Radical::App
+class Routes < Radical::Routes
   root Home
+end
+
+class App < Radical::App
+  routes Routes
 end
 
 run App

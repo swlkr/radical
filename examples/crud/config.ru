@@ -3,15 +3,13 @@ require '../../lib/radical'
 Radical::Database.prepend_migrations_path '/var/app/examples/crud'
 Radical::Database.migrate!
 
+class Todo < Radical::Model
+  table :todos
+end
+
 class Controller < Radical::Controller
   prepend_view_path '/var/app/examples/crud'
   layout 'layout'
-end
-
-class Model < Radical::Model; end
-
-class Todo < Model
-  table 'todos'
 end
 
 class Todos < Controller
@@ -74,8 +72,12 @@ class Todos < Controller
   end
 end
 
+class Routes < Radical::Routes
+  resources :Todos
+end
+
 class App < Radical::App
-  resources Todos
+  routes Routes
 end
 
 run App

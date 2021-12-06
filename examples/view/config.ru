@@ -16,9 +16,13 @@ class About < Controller
   end
 end
 
+class Routes < Radical::Routes
+  root :Home
+  resources :About
+end
+
 class App < Radical::App
-  root Home
-  resources About
+  routes Routes
 end
 
 run App

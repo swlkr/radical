@@ -1,4 +1,4 @@
-Radical::Database.migration do
+class CreateTableTodos < Radical::Migration
   change do
     create_table :todos do |t|
       t.string :name
