@@ -1,27 +1,30 @@
 # Changelog
+
 All notable changes to this project will be documented in this file
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
-- Move connection string handling to database
-- Make everything use `frozen_string_literal`
-- Create migration class, use migration classes in migrate!
-- Move route class methods to `Routes` class instead of `App`
-- Purposefully never add callbacks
-- Purposefully never add `before_action`/`before_filter`
-- Make routes take symbols, not classes to better line up with models
+# 1.1.0 (2021-12-06)
 
-# 1.0.2
+- *Breaking* `root`, `resource` and `resources` methods no longer take class constants
+- *Breaking* Move route class methods to `Routes` class instead of `App`
+- *Breaking* Create migration class, use migration classes in migrate!
+- *Breaking* Make routes take symbols or strings, not classes to better line up with models
+- *Breaking* Move connection string handling to database
+- Make everything use `frozen_string_literal`
+- Purposefully never add callbacks, `before_action` or autoloading
+
+# 1.0.2 (2021-12-02)
 
 - Set default views / migrations paths
 
-# 1.0.1
+# 1.0.1 (2021-12-02)
 
 - Fix changelog link in gemspec
 
-# 1.0.0
+# 1.0.0 (2021-12-01)
 
 - Very basic understanding of how much memory it takes for a basic ruby app
 - Start to integrate controllers and routing
