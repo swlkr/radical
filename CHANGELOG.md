@@ -5,7 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
-- Move migration/connection string stuff to database
+- Move connection string handling to database
+- Make everything use `frozen_string_literal`
+- Create migration class, use migration classes in migrate!
+- Move route class methods to `Routes` class instead of `App`
+- Purposefully never add callbacks
+- Purposefully never add `before_action`/`before_filter`
+- Make routes take symbols, not classes to better line up with models
 
 # 1.0.2
 
