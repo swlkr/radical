@@ -6,7 +6,7 @@ Radical::Database.prepend_migrations_path '/var/app/examples/crud'
 Radical::Database.migrate!
 
 class Todo < Radical::Model
-  table :todos
+  table 'todos'
 end
 
 class Controller < Radical::Controller
@@ -75,7 +75,7 @@ class Todos < Controller
 end
 
 class Routes < Radical::Routes
-  resources :Todos
+  resources 'Todos'
 end
 
 class App < Radical::App
