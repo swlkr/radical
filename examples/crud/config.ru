@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require '../../lib/radical'
 
 Radical::Database.prepend_migrations_path '/var/app/examples/crud'

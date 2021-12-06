@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require '../../lib/radical'
 
 class Home < Radical::Controller

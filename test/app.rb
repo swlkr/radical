@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'radical'
 
 def require_all(dir)
