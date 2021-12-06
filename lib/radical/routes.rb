@@ -9,18 +9,18 @@ module Radical
         @router ||= Router.new
       end
 
-      def root(klass)
-        router.add_root(klass)
+      def root(sym)
+        router.add_root(Object.const_get(sym))
       end
 
-      def resource(klass)
-        router.add_actions(klass, actions: Router::RESOURCE_ACTIONS)
+      def resource(sym)
+        router.add_actions(Object.const_get(sym), actions: Router::RESOURCE_ACTIONS)
       end
 
-      def resources(*classes, &block)
+      def resources(*symbols, &block)
         prefix = "#{router.route_prefix(@parents)}/" if instance_variable_defined?(:@parents)
 
-        classes.map! { |c| Object.const_get(c) }
+        classes = symbols.map { |c| Object.const_get(c) }
 
         router.add_routes(classes, prefix: prefix)
 
