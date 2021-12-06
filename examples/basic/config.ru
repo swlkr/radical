@@ -9,7 +9,7 @@ class Home < Radical::Controller
 end
 
 class Routes < Radical::Routes
-  root :Home
+  root 'Home'
 end
 
 class App < Radical::App

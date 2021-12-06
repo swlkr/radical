@@ -19,15 +19,19 @@ class D < Radical::Controller
   end
 end
 
-class App < Radical::App
-  root Home
-  resources Todos
-  resources TodoItems
-  resources A, B
+class Routes < Radical::Routes
+  root 'Home'
+  resources 'Todos'
+  resources 'TodoItems'
+  resources 'A', 'B'
 
-  resource Profile
+  resource 'Profile'
 
-  resources C do
-    resources D
+  resources 'C' do
+    resources 'D'
   end
+end
+
+class App < Radical::App
+  routes Routes
 end
