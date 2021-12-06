@@ -1,4 +1,6 @@
+# frozen_string_literal: true
 # typed: true
+
 require 'rack'
 require 'sorbet-runtime'
 
@@ -77,7 +79,7 @@ module Radical
         next unless klass.method_defined?(method)
 
         path = "/#{prefix}#{name}#{suffix}"
-        path = Regexp.new("^#{path.gsub(/:(\w+)/, '(?<\1>[a-zA-Z0-9_]+)')}$")
+        path = Regexp.new("^#{path.gsub(/:(\w+)/, '(?<\1>[a-zA-Z0-9_]+)')}$").freeze
 
         if %i[index create show update destroy].include?(method) && !klass.method_defined?(:"#{klass.route_name}_path")
           klass.define_method :"#{klass.route_name}_path" do |obj = nil|

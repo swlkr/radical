@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Radical
   class Table
     attr_accessor :columns
