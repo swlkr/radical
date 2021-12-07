@@ -35,7 +35,7 @@ There are only ever 7 resource routes for any resource:
 If you're coming from rails:
 
 - There is no converting from singular/plural convention
-- You pass classes to the router, not strings
+- There is also no converting from camel case to/from snake case
 - The `_path` methods are exactly what you would expect
 
 Here's an example:
@@ -56,9 +56,9 @@ class Session < Radical::Controller
 end
 
 class App
-  root Home # => Resolves to "/" instead of controller name
-  resources Todos # => resolves to /todos, /todos/new, /todos/:id, /todos/:id/edit
-  resource Session # => resolves to /session, /session/new, /session/edit
-  resources Item # => resolves to /item, /item/new, /item/:id, /item/:id/edit
+  root :Home # => Resolves to "/" instead of controller name
+  resources :Todos # => resolves to /todos, /todos/new, /todos/:id, /todos/:id/edit
+  resource :Session # => resolves to /session, /session/new, /session/edit
+  resources :Item # => resolves to /item, /item/new, /item/:id, /item/:id/edit
 end
 ```

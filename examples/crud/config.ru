@@ -75,7 +75,7 @@ class Todos < Controller
 end
 
 class Routes < Radical::Routes
-  resources 'Todos'
+  resources :Todos
 end
 
 class App < Radical::App
