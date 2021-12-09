@@ -6,3 +6,10 @@ require_relative 'radical/view'
 require_relative 'radical/model'
 require_relative 'radical/migration'
 require_relative 'radical/routes'
+require_relative 'radical/env'
+
+module Radical
+  def env
+    Radical::Env
+  end
+end
