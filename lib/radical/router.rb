@@ -47,6 +47,8 @@ module Radical
     ].freeze
 
     RESOURCE_ACTIONS = [
+      [:new, 'GET', '/new'],
+      [:create, 'POST', ''],
       [:show, 'GET', ''],
       [:edit, 'GET', '/edit'],
       [:update, 'PUT', ''],
