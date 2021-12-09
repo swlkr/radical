@@ -45,6 +45,7 @@ module Radical
       def app
         router = @routes.router
         env = self.env
+        session_secret = self.session_secret
 
         @app ||= Rack::Builder.app do
           use Rack::CommonLogger
@@ -58,7 +59,7 @@ module Radical
           use Rack::ConditionalGet
           use Rack::ContentType
           use Rack::Session::Cookie, path: '/',
-                                     secret: ENV['SESSION_SECRET'] || SecureRandom.hex(32),
+                                     secret: session_secret,
                                      http_only: true,
                                      same_site: :lax,
                                      secure: env.production?,
@@ -80,6 +81,12 @@ module Radical
 
       def call(env)
         app.call(env)
+      end
+
+      private
+
+      def session_secret
+        @session_secret ||= (ENV['SESSION_SECRET'] || SecureRandom.hex(32))
       end
     end
   end
