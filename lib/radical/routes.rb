@@ -13,6 +13,10 @@ module Radical
         @router ||= Router.new
       end
 
+      def parents
+        @parents ||= []
+      end
+
       sig { params(name: T.any(String, Symbol)).void }
       def root(name)
         klass = Object.const_get(name)
@@ -25,7 +29,7 @@ module Radical
         classes = names.map { |c| Object.const_get(c) }
 
         classes.each do |klass|
-          router.add_actions(klass, actions: Router::RESOURCE_ACTIONS)
+          router.add_resource(klass)
         end
       end
 
@@ -33,14 +37,21 @@ module Radical
       def resources(*names, &block)
         classes = names.map { |c| Object.const_get(c) }
 
-        prefix = "#{router.route_prefix(@parents)}/" if instance_variable_defined?(:@parents)
+        classes.each do |klass|
+          if parents.any?
+            router.add_resources(klass, parents: @parents)
 
-        router.add_routes(classes, prefix: prefix)
+            # only one level of nesting
+            @parents = []
+          else
+            router.add_resources(klass)
+          end
+        end
 
         return unless block
 
-        @parents ||= []
-        @parents << classes.last
+        @parents = classes
+
         block.call
       end
     end

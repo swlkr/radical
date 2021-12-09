@@ -3,6 +3,7 @@ require 'radical'
 
 class Whatever < Radical::Controller
   def index; end
+
   def edit; end
 end
 
@@ -24,15 +25,9 @@ class TestRouter < Minitest::Test
   end
 
   def test_adds_resource_routes_when_methods_defined
-    @router.add_routes([Whatever])
+    @router.add_resources(Whatever)
 
     assert_equal [[/^\/whatever$/, [Whatever, :index]], [/^\/whatever\/(?<id>[a-zA-Z0-9_]+)\/edit$/, [Whatever, :edit]]], @router.routes['GET']
-  end
-
-  def test_multiple_resources_arguments
-    @router.add_routes([A, B])
-
-    assert_equal [[/^\/a$/, [A, :index]], [/^\/b$/, [B, :index]]], @router.routes['GET']
   end
 
   def test_long_route_name

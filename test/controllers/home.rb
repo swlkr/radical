@@ -1,5 +1,3 @@
-require 'radical'
-
 class Home < Radical::Controller
   def index
     @page = 'home#index'

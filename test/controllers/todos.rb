@@ -1,5 +1,3 @@
-require 'radical'
-
 class Todos < Radical::Controller
   # GET /todos
   def index

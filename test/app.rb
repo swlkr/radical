@@ -14,21 +14,25 @@ class C < Radical::Controller
 end
 
 class D < Radical::Controller
+  def index
+    plain "c:#{params['c_id']}"
+  end
+
   def show
-    plain "c:#{params['c_id']}, d:#{params['id']}"
+    plain "d:#{params['id']}"
   end
 end
 
 class Routes < Radical::Routes
-  root 'Home'
-  resources 'Todos'
-  resources 'TodoItems'
-  resources 'A', 'B'
+  root :Home
+  resources :Todos
+  resources :TodoItems
+  resources :A, :B
 
-  resource 'Profile'
+  resource :Profile
 
-  resources 'C' do
-    resources 'D'
+  resources :C do
+    resources :D
   end
 end
 
