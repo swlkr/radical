@@ -49,7 +49,7 @@ module Radical
     def initialize(params = {})
       columns.each do |column|
         self.class.attr_accessor column.to_sym
-        instance_variable_set "@#{column}", params[column]
+        instance_variable_set "@#{column}", (params[column] || params[column.to_sym])
       end
     end
 
