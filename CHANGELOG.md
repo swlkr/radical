@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
+- Add `Radical.env.[development?|production?|test?]`
+- Add `_path` support for nested resource routes
+- Add a random secret to the session cookie on startup
+- *Breaking* Support only one level of nested resources, make them shallow only
+
 # 1.1.0 (2021-12-06)
 
 - *Breaking* `root`, `resource` and `resources` methods no longer take class constants
