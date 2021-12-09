@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'securerandom'
 require 'rack'
 require 'rack/flash'
 require 'rack/csrf'
@@ -57,7 +58,7 @@ module Radical
           use Rack::ConditionalGet
           use Rack::ContentType
           use Rack::Session::Cookie, path: '/',
-                                     secret: ENV['SESSION_SECRET'],
+                                     secret: ENV['SESSION_SECRET'] || SecureRandom.hex(32),
                                      http_only: true,
                                      same_site: :lax,
                                      secure: env.production?,
