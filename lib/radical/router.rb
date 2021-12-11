@@ -93,8 +93,8 @@ module Radical
       end
     end
 
-    sig { params(request: Rack::Request).returns(Rack::Response) }
-    def route(request)
+    sig { params(request: Rack::Request, options: T.nilable(Hash)).returns(Rack::Response) }
+    def route(request, options: {})
       params = T.let({}, T.nilable(Hash))
 
       route = @routes[request.request_method].find do |r|
@@ -109,7 +109,7 @@ module Radical
         request.update_param(k, v)
       end
 
-      instance = klass.new(request)
+      instance = klass.new(request, options: options)
 
       response = instance.public_send(method)
 

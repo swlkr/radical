@@ -72,9 +72,12 @@ module Radical
       end
     end
 
-    sig { params(request: Rack::Request).void }
-    def initialize(request)
+    attr_reader :options
+
+    sig { params(request: Rack::Request, options: T.nilable(Hash)).void }
+    def initialize(request, options: {})
       @request = request
+      @options = options
     end
 
     sig { params(status: T.any(Symbol, Integer)).returns(Rack::Response) }
@@ -130,6 +133,28 @@ module Radical
       @request.env['rack.session']
     end
 
+    def assets_path(type)
+      assets = options[:assets]
+
+      if Env.production?
+        if type == :css
+          link_tag(assets.compiled[:css])
+        else
+          script_tag(assets.compiled[:js])
+        end
+      else
+        if type == :css
+          assets.assets[:css].map do |asset|
+            link_tag("/assets/#{type}/#{asset}")
+          end.join("\n")
+        else
+          assets.assets[:js].map do |asset|
+            script_tag("/assets/#{type}/#{asset}")
+          end.join("\n")
+        end
+      end
+    end
+
     private
 
     def emit(tag)
@@ -141,6 +166,14 @@ module Radical
       @output = eval('_buf', block.binding)
       yield
       @output
+    end
+
+    def script_tag(src)
+      "<script type=\"application/javascript\" src=\"#{src}\"></script>"
+    end
+
+    def link_tag(href)
+      "<link rel=\"stylesheet\" type=\"text/css\" href=\"#{href}\" />"
     end
   end
 end
