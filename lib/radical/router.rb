@@ -70,7 +70,7 @@ module Radical
 
     sig { params(klass: Class).void }
     def add_root(klass)
-      add_routes(klass, name: '', actions: RESOURCE_ACTIONS)
+      add_routes(klass, name: '', actions: ACTIONS)
       add_root_paths(klass)
     end
 
