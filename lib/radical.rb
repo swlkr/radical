@@ -9,7 +9,7 @@ require_relative 'radical/routes'
 require_relative 'radical/env'
 
 module Radical
-  def env
+  def self.env
     Radical::Env
   end
 end
