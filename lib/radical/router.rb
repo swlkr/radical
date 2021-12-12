@@ -152,7 +152,7 @@ module Radical
       route_name = klass.route_name
 
       if %i[index create show update destroy].any? { |method| klass.method_defined?(method) }
-        klass.define_method :"#{route_name}_path" do |obj = nil|
+        Controller.define_method :"#{route_name}_path" do |obj = nil|
           if obj
             "/#{obj.id}"
           else
@@ -162,14 +162,14 @@ module Radical
       end
 
       if klass.method_defined?(:new)
-        klass.defined_method :"new_#{route_name}_path" do
+        Controller.defined_method :"new_#{route_name}_path" do
           '/new'
         end
       end
 
       return unless klass.method_defined?(:edit)
 
-      klass.defined_method :"edit_#{route_name}_path" do |obj|
+      Controller.defined_method :"edit_#{route_name}_path" do |obj|
         "/#{obj.id}/edit"
       end
     end
@@ -179,20 +179,20 @@ module Radical
       name = klass.route_name
 
       if %i[create show update destroy].any? { |method| klass.method_defined?(method) }
-        klass.define_method :"#{name}_path" do
+        Controller.define_method :"#{name}_path" do
           "/#{name}"
         end
       end
 
       if klass.method_defined?(:new)
-        klass.define_method :"new_#{name}_path" do
+        Controller.define_method :"new_#{name}_path" do
           "/#{name}/new"
         end
       end
 
       return unless klass.method_defined?(:edit)
 
-      klass.define_method :"edit_#{name}_path" do
+      Controller.define_method :"edit_#{name}_path" do
         "/#{name}/edit"
       end
     end
@@ -205,15 +205,15 @@ module Radical
 
       if %i[index create show update destroy].any? { |method| klass.method_defined?(method) }
         if scope
-          klass.define_method :"#{scope_path_name}_path" do |parent|
+          Controller.define_method :"#{scope_path_name}_path" do |parent|
             "/#{scope.route_name}/#{parent.id}/#{name}"
           end
 
-          klass.define_method :"#{path_name}_path" do |obj|
+          Controller.define_method :"#{path_name}_path" do |obj|
             "/#{name}/#{obj.id}"
           end
         else
-          klass.define_method :"#{path_name}_path" do |obj = nil|
+          Controller.define_method :"#{path_name}_path" do |obj = nil|
             if obj
               "/#{name}/#{obj.id}"
             else
@@ -225,11 +225,11 @@ module Radical
 
       if klass.method_defined?(:new)
         if scope
-          klass.define_method :"new_#{scope_path_name}_path" do |parent|
+          Controller.define_method :"new_#{scope_path_name}_path" do |parent|
             "/#{scope.route_name}/#{parent.id}/#{name}/new"
           end
         else
-          klass.define_method :"new_#{path_name}_path" do
+          Controller.define_method :"new_#{path_name}_path" do
             "/#{name}/new"
           end
         end
@@ -237,7 +237,7 @@ module Radical
 
       return unless klass.method_defined?(:edit)
 
-      klass.define_method :"edit_#{path_name}_path" do |obj|
+      Controller.define_method :"edit_#{path_name}_path" do |obj|
         "/#{name}/#{obj.id}/edit"
       end
     end
