@@ -60,6 +60,19 @@ module Radical
         @security_headers = headers
       end
 
+      def session(options = {})
+        defaults = {
+          path: '/',
+          secret: session_secret,
+          http_only: true,
+          same_site: :lax,
+          secure: env.production?,
+          expire_after: 2_592_000 # 30 days
+        }
+
+        @session = defaults.merge(options)
+      end
+
       def env
         Env
       end
@@ -67,10 +80,10 @@ module Radical
       def app
         router = @routes.router
         env = self.env
-        session_secret = self.session_secret
         assets = @assets
         serve_assets = @serve_assets
         security_headers = @security_headers || {}
+        session = @session || self.session
 
         @app ||= Rack::Builder.app do
           use Rack::CommonLogger
@@ -83,12 +96,7 @@ module Radical
           use Rack::Head
           use Rack::ConditionalGet
           use Rack::ContentType
-          use Rack::Session::Cookie, path: '/',
-                                     secret: session_secret,
-                                     http_only: true,
-                                     same_site: :lax,
-                                     secure: env.production?,
-                                     expire_after: 2_592_000 # 30 days
+          use Rack::Session::Cookie, session
           use Rack::Csrf, raise: env.development?, skip: router.routes.values.flatten.select { |a| a.is_a?(Class) }.uniq.map(&:skip_csrf_actions).flatten(1)
           use Flash
           use SecurityHeaders, security_headers
