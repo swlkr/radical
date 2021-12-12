@@ -4,12 +4,13 @@ require 'securerandom'
 require 'rack'
 require 'rack/csrf'
 
-require_relative 'routes'
-require_relative 'env'
-require_relative 'flash'
 require_relative 'asset'
 require_relative 'assets'
 require_relative 'asset_compiler'
+require_relative 'env'
+require_relative 'flash'
+require_relative 'routes'
+require_relative 'security_headers'
 
 # The main entry point for a Radical application
 #
@@ -55,6 +56,10 @@ module Radical
         @serve_assets = true
       end
 
+      def security_headers(headers = {})
+        @security_headers = headers
+      end
+
       def env
         Env
       end
@@ -65,6 +70,7 @@ module Radical
         session_secret = self.session_secret
         assets = @assets
         serve_assets = @serve_assets
+        security_headers = @security_headers || {}
 
         @app ||= Rack::Builder.app do
           use Rack::CommonLogger
@@ -85,6 +91,7 @@ module Radical
                                      expire_after: 2_592_000 # 30 days
           use Rack::Csrf, raise: env.development?, skip: router.routes.values.flatten.select { |a| a.is_a?(Class) }.uniq.map(&:skip_csrf_actions).flatten(1)
           use Flash
+          use SecurityHeaders, security_headers
 
           if serve_assets || env.development?
             use Rack::Static, urls: ['/assets', '/public'],

@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - *Breaking* Support only one level of nested resources, make them shallow only
 - Add asset concatention + compression (no minification yet)
 - Remove dependence on rack-flash3
+- Add security headers
 
 # 1.1.0 (2021-12-06)
 
