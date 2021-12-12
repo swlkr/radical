@@ -91,8 +91,8 @@ module Radical
           use Rack::Runtime
           use Rack::MethodOverride
           use Rack::ContentLength
-          use Rack::Deflater
           use Rack::ETag
+          use Rack::Deflater
           use Rack::Head
           use Rack::ConditionalGet
           use Rack::ContentType
