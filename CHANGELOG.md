@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Add asset concatention + compression (no minification yet)
 - Remove dependence on rack-flash3
 - Add security headers
+- Add session configuration with `session` method in `App`
 
 # 1.1.0 (2021-12-06)
 
