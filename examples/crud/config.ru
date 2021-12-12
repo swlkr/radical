@@ -46,6 +46,7 @@ class Todos < Controller
   # PUT or PATCH /todos/:id
   def update
     if todo.update(todo_params)
+      flash[:success] = 'Todo updated successfully'
       redirect todos_path
     else
       view :edit

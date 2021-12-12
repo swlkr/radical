@@ -4,12 +4,12 @@ require 'brotli'
 require 'digest'
 require 'securerandom'
 require 'rack'
-require 'rack/flash'
 require 'rack/csrf'
 require 'zlib'
 
 require_relative 'routes'
 require_relative 'env'
+require_relative 'flash'
 
 # The main entry point for a Radical application
 #
@@ -180,7 +180,7 @@ module Radical
                                      secure: env.production?,
                                      expire_after: 2_592_000 # 30 days
           use Rack::Csrf, raise: env.development?, skip: router.routes.values.flatten.select { |a| a.is_a?(Class) }.uniq.map(&:skip_csrf_actions).flatten(1)
-          use Rack::Flash, sweep: true
+          use Flash
 
           if serve_assets || env.development?
             use Rack::Static, urls: ['/assets', '/public'],
