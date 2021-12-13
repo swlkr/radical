@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Add security headers
 - Add session configuration with `session` method in `App`
 - Move all `_path` method definitions to `Radical::Controller`
+- *Breaking* Move `db/migrations` to `migrations`
 
 # 1.1.0 (2021-12-06)
 

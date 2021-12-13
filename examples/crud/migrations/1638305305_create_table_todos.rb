@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTableTodos < Radical::Migration
   change do
     create_table :todos do |t|
