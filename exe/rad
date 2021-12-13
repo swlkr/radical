@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/radical/generator'
+require 'optparse'
+
+@options = {}
+
+OptionParser.new do |opts|
+  opts.on('-v', '--verbose', 'Show extra information') do
+    @options[:verbose] = true
+  end
+
+  opts.on('-h', '--help', 'Show help information') do
+    @options[:help] = true
+  end
+end.parse!
+
+generate = Radical::Generator.new(ARGV[2], ARGV.drop(3)) if %w[g generate].include?(ARGV.first)
+
+case ARGV[0..1]
+when %w[g mvc], %w[generate mvc]
+  generate.mvc
+when %w[g model], %w[generate model]
+  generate.migration
+  generate.model
+when %w[g controller], %w[generate controller]
+  generate.controller
+when %w[g views], %w[generate views]
+  generate.views
+when %w[g migration], %w[generate migration]
+  generate.migration(model: false)
+else
+  puts 'Command not supported'
+end

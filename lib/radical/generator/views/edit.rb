@@ -1,0 +1,3 @@
+<<~ERB
+  <%== partial 'form' %>
+ERB
