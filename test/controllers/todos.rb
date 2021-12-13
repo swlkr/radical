@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Todos < Radical::Controller
   # GET /todos
   def index
