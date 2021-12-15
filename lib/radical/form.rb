@@ -5,7 +5,6 @@ require 'rack/csrf'
 module Radical
   class Form
     SELF_CLOSING_TAGS = %w[
-    }
       area
       base
       br
