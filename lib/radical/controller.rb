@@ -158,12 +158,12 @@ module Radical
     private
 
     def emit(tag)
-      @output = '' if @output.nil?
+      @output = String.new if @output.nil?
       @output << tag.to_s
     end
 
     def capture(block)
-      @output = eval('_buf', block.binding)
+      @output = eval '_buf', block.binding
       yield
       @output
     end

@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Move all `_path` method definitions to `Radical::Controller`
 - *Breaking* Move `db/migrations` to `migrations`
 - Add basic generators
+- *Breaking* Change `<%== f.button 'Save' %>` to `<%== f.submit 'Save' %>`
+- Add attrs to form helpers
 
 # 1.1.0 (2021-12-06)
 

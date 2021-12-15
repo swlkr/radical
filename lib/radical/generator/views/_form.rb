@@ -1,6 +1,6 @@
 <<~ERB
   <%== form model: #{singular} do |f| %>
     #{inputs(leading: 4)}
-    <%== f.button 'Save' %>
+    <%== f.submit 'Save' %>
   <% end %>
 ERB
