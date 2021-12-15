@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Add basic generators
 - *Breaking* Change `<%== f.button 'Save' %>` to `<%== f.submit 'Save' %>`
 - Add attrs to form helpers
+- Add app generator
 
 # 1.1.0 (2021-12-06)
 
