@@ -62,7 +62,7 @@ module Radical
       when String
         attrs[:value] = value_or_attrs
       when Hash
-        attrs = value_or_options || {}
+        attrs = value_or_attrs || {}
       end
 
       tag 'input', attrs.merge('type' => 'submit')
