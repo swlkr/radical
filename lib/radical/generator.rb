@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require 'securerandom'
 
 module Radical
   class Generator
@@ -52,6 +53,33 @@ module Radical
       Dir[File.join(__dir__, 'generator', 'views', '*.rb')].sort.each do |template|
         contents = instance_eval File.read template
         filename = File.join(dir, "#{File.basename(template, '.rb')}.erb")
+
+        write(filename, contents)
+      end
+    end
+
+    def app
+      dir = File.join Dir.pwd, @name
+      FileUtils.mkdir_p dir
+
+      %w[
+        assets/css
+        assets/js
+        controllers
+        migrations
+        models
+        views
+      ].each do |dir_|
+        FileUtils.mkdir_p File.join(dir, dir_)
+      end
+
+      write(File.join(dir, 'models', 'model.rb'), "# frozen_string_literal: true\n\nclass Model < Radical::Model\nend")
+      write(File.join(dir, 'controllers', 'controller.rb'), "# frozen_string_literal: true\n\nclass Controller < Radical::Controller\nend")
+      write(File.join(dir, '.env'), "RADICAL_ENV=development\nSESSION_SECRET=#{SecureRandom.hex(32)}\nDATABASE_URL=development.sqlite3")
+
+      Dir[File.join(__dir__, 'generator', 'app', '*.*')].sort.each do |template|
+        filename = File.join(dir, File.basename(template))
+        contents = File.read template
 
         write(filename, contents)
       end
