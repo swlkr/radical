@@ -4,5 +4,6 @@
   # frozen_string_literal: true
 
   class #{singular_constant} < Model
+    table '#{plural}'
   end
 RB
