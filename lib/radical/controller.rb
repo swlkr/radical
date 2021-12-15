@@ -137,21 +137,29 @@ module Radical
       assets = options[:assets]
 
       if Env.production?
-        if type == :css
-          link_tag(assets.compiled[:css])
-        else
-          script_tag(assets.compiled[:js])
-        end
+        compiled_assets_path(assets, type)
       else
-        if type == :css
-          assets.assets[:css].map do |asset|
-            link_tag("/assets/#{type}/#{asset}")
-          end.join("\n")
-        else
-          assets.assets[:js].map do |asset|
-            script_tag("/assets/#{type}/#{asset}")
-          end.join("\n")
-        end
+        not_compiled_assets_path(assets, type)
+      end
+    end
+
+    def compiled_assets_path(assets, type)
+      if type == :css
+        link_tag(assets.compiled[:css])
+      else
+        script_tag(assets.compiled[:js])
+      end
+    end
+
+    def not_compiled_assets_path(assets, type)
+      if type == :css
+        assets.assets[:css].map do |asset|
+          link_tag("/assets/#{type}/#{asset}")
+        end.join("\n")
+      else
+        assets.assets[:js].map do |asset|
+          script_tag("/assets/#{type}/#{asset}")
+        end.join("\n")
       end
     end
 
