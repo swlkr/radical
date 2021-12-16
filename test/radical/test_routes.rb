@@ -2,20 +2,9 @@
 
 require 'minitest/autorun'
 require 'radical'
+require 'models/test_model'
 
-class Model < Radical::Model
-  class << self
-    def db
-      true
-    end
-
-    def columns
-      %w[id]
-    end
-  end
-end
-
-class M < Model; end
+class M < TestModel; end
 
 class Ms < Radical::Controller
   def index; end
@@ -57,9 +46,9 @@ class Hs < Radical::Controller
   def index; end
 end
 
-class F < Model; end
+class F < TestModel; end
 
-class G < Model; end
+class G < TestModel; end
 
 class TestRoutes < Minitest::Test
   def test_resource_paths

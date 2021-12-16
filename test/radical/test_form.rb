@@ -2,13 +2,20 @@
 
 require 'minitest/autorun'
 require 'radical'
+require 'models/test_model'
 
 module Radical
-  class FormsController < Controller; end
+  class TestFormsController < Controller
+    def create; end
+  end
+
+  class TestFormModel < TestModel
+    table 'test_forms'
+  end
 
   class TestForm < Minitest::Test
     def setup
-      @controller = FormsController.new(Rack::Request.new({}))
+      @controller = TestFormsController.new(Rack::Request.new({}))
       @form = Form.new({}, @controller)
     end
 
@@ -29,7 +36,7 @@ module Radical
     end
 
     def test_button_with_block
-      assert_equal '<button>push me</button>', @form.button { 'push me' }
+      assert_equal('<button>push me</button>', @form.button { 'push me' })
     end
   end
 end

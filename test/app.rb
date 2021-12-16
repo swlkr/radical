@@ -27,7 +27,7 @@ class Routes < Radical::Routes
   root :Home
   resources :Todos
   resources :TodoItems
-  resources :A, :B
+  resources :As, :B
 
   resource :Profile
 
