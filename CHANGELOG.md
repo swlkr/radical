@@ -6,19 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
+- *Breaking* Support only one level of nested resources, make them shallow only
+- *Breaking* Move `db/migrations` to `migrations`
+- *Breaking* Change `<%== f.button 'Save' %>` to `<%== f.submit 'Save' %>`
+- *Breaking* Change the form helpers from `model[name]` to just `name`, it's cleaner.
 - Add `Radical.env.[development?|production?|test?]`
 - Add `_path` support for nested resource routes
 - Add a random secret to the session cookie on startup
-- *Breaking* Support only one level of nested resources, make them shallow only
 - Add asset concatention + compression (no minification yet)
 - Remove dependence on rack-flash3
 - Add security headers
 - Add session configuration with `session` method in `App`
 - Move all `_path` method definitions to `Radical::Controller`
-- *Breaking* Move `db/migrations` to `migrations`
 - Add `exe/rad`
 - Add `rad g mvc Todo(s) name:text done_at:integer` generators
-- *Breaking* Change `<%== f.button 'Save' %>` to `<%== f.submit 'Save' %>`
 - Add attrs to form helpers
 - Add `rad g app` generator
 - Add migrate/rollback `rad` commands
