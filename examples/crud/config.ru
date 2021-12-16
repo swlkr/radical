@@ -11,7 +11,6 @@ end
 
 class Controller < Radical::Controller
   prepend_view_path '/var/app/examples/crud'
-  layout 'layout'
 end
 
 class Todos < Controller
