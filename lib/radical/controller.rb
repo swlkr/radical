@@ -95,13 +95,13 @@ module Radical
       @request.params
     end
 
-    sig { params(name: T.any(String, Symbol)).returns(String) }
-    def view(name)
-      View.render(self.class.route_name, name, self)
+    sig { params(name: T.any(String, Symbol), locals: T.nilable(Hash)).returns(String) }
+    def view(name, locals = {})
+      View.render(self.class.route_name, name, self, { locals: locals })
     end
 
     sig { params(name: T.any(String, Symbol), locals: T.nilable(Hash)).returns(String) }
-    def partial(name, locals)
+    def partial(name, locals = {})
       View.render(self.class.route_name, "_#{name}", self, { locals: locals, layout: false })
     end
 
