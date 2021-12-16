@@ -100,9 +100,9 @@ module Radical
       View.render(self.class.route_name, name, self)
     end
 
-    sig { params(name: T.any(String, Symbol)).returns(String) }
-    def partial(name)
-      View.render(self.class.route_name, "_#{name}", self, layout: false)
+    sig { params(name: T.any(String, Symbol), locals: T.nilable(Hash)).returns(String) }
+    def partial(name, locals)
+      View.render(self.class.route_name, "_#{name}", self, { locals: locals, layout: false })
     end
 
     sig { params(options: Hash, block: T.proc.void).returns(String) }

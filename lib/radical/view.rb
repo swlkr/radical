@@ -48,8 +48,8 @@ module Radical
         if options[:layout] != false
           layout = template '', @_layout || 'layout'
 
-          layout.render(scope, {}) do
-            t.render scope
+          layout.render scope, {} do
+            t.render scope, options[:locals] || {}
           end
         else
           t.render scope
