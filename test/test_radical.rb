@@ -58,4 +58,16 @@ class RadicalTest < Minitest::Test
     assert last_response.ok?
     assert_equal 'c:1', last_response.body
   end
+
+  def test_views
+    get '/'
+    assert last_response.ok?
+    assert '<h1>home#index</h1>', strip_encoding(last_response.body)
+  end
+
+  private
+
+  def strip_encoding(s)
+    s.split("\n").last
+  end
 end

@@ -8,6 +8,8 @@ def require_all(dir)
   end
 end
 
+Radical::Controller.prepend_view_path 'test'
+
 require_all 'controllers'
 
 class C < Radical::Controller
