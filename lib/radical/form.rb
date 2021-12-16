@@ -25,27 +25,19 @@ module Radical
     def initialize(options, controller)
       @model = options[:model]
       @controller = controller
-      @route_name = @controller.class.route_name
       @override_method = options[:method]&.upcase || (@model&.saved? ? 'PATCH' : 'POST')
       @method = %w[GET POST].include?(@override_method) ? @override_method : 'POST'
-
-      @action = if @model&.saved?
-                  @controller.public_send(:"#{@route_name}_path", @model)
-                elsif @model && !@model.saved?
-                  @controller.public_send(:"#{@route_name}_path")
-                else
-                  options[:action] || 'POST'
-                end
+      @action = options[:action] || action_from(model: @model, controller: controller)
     end
 
     def text(name, attrs = {})
-      attrs.merge!(type: 'text', name: "#{@route_name}[#{name}]", value: @model&.public_send(name))
+      attrs.merge!(type: 'text', name: name, value: @model&.public_send(name))
 
       tag 'input', attrs
     end
 
     def number(name, attrs = {})
-      attrs.merge!(type: 'number', name: "#{@route_name}[#{name}]", value: @model&.public_send(name))
+      attrs.merge!(type: 'number', name: name, value: @model&.public_send(name))
 
       tag 'input', attrs
     end
@@ -98,6 +90,18 @@ module Radical
 
     def html_attributes(options = {})
       options.transform_keys(&:to_s).sort_by { |k, _| k }.map { |k, v| "#{k}=\"#{v}\"" }.join(' ')
+    end
+
+    def action_from(controller:, model:)
+      return if model.nil?
+
+      route_name = controller.class.route_name
+
+      if model.saved?
+        controller.send(:"#{route_name}_path", model)
+      else
+        controller.send(:"new_#{route_name}_path", model)
+      end
     end
   end
 end
