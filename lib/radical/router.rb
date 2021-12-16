@@ -162,14 +162,14 @@ module Radical
       end
 
       if klass.method_defined?(:new)
-        Controller.defined_method :"new_#{route_name}_path" do
+        Controller.define_method :"new_#{route_name}_path" do
           '/new'
         end
       end
 
       return unless klass.method_defined?(:edit)
 
-      Controller.defined_method :"edit_#{route_name}_path" do |obj|
+      Controller.define_method :"edit_#{route_name}_path" do |obj|
         "/#{obj.id}/edit"
       end
     end
