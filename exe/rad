@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/radical/generator'
+require_relative '../lib/radical/database'
 require 'optparse'
 
 @options = {}
@@ -31,6 +32,10 @@ when %w[g migration], %w[generate migration]
   generate.migration(model: false)
 when %w[g app]
   generate.app
+when %w[migrate]
+  Radical::Database.migrate!
+when %w[rollback]
+  Radical::Database.rollback!
 else
   puts 'Command not supported'
 end
