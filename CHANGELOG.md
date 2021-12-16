@@ -16,10 +16,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Add session configuration with `session` method in `App`
 - Move all `_path` method definitions to `Radical::Controller`
 - *Breaking* Move `db/migrations` to `migrations`
-- Add basic generators
+- Add `exe/rad`
+- Add `rad g mvc Todo(s) name:text done_at:integer` generators
 - *Breaking* Change `<%== f.button 'Save' %>` to `<%== f.submit 'Save' %>`
 - Add attrs to form helpers
-- Add app generator
+- Add `rad g app` generator
+- Add migrate/rollback `rad` commands
 
 # 1.1.0 (2021-12-06)
 
