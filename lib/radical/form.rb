@@ -100,7 +100,7 @@ module Radical
       if model.saved?
         controller.send(:"#{route_name}_path", model)
       else
-        controller.send(:"new_#{route_name}_path", model)
+        controller.send(:"#{route_name}_path")
       end
     end
   end
