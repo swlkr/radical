@@ -53,7 +53,7 @@ module Radical
       def render(dir, name, scope, options = {})
         t = template!(dir, name)
 
-        layout = template('', @_layout || 'layout') unless options[:layout] != false
+        layout = template('', @_layout || 'layout') unless options[:layout] == false
 
         if layout
           layout.render scope, {} do
