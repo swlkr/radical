@@ -6,6 +6,6 @@ More specifically, I wanted to see if I could slim down rails and take "conventi
 
 Imagine postgresql, mysql and sql server and then imagine sqlite kind of off in the corner doing crazy stuff like single file databases that actually work pretty well for most projects.
 
-Think of this thing like what sqlite is to postgres, a "lite" version of rails.
+Think of this thing like what sqlite is to postgres, a "lite" version of rails with no configuration.
 
 ![](https://i.giphy.com/media/2wZpm9zyceDyXHPf5S/giphy-downsized.gif)
