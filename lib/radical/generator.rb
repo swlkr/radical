@@ -59,7 +59,9 @@ module Radical
     end
 
     def app
-      dir = File.join Dir.pwd, @name
+      @name = nil if @name == '.'
+      parts = [Dir.pwd, @name].compact
+      dir = File.join(*parts)
       FileUtils.mkdir_p dir
 
       %w[
@@ -70,19 +72,22 @@ module Radical
         models
         views
       ].each do |dir_|
+        puts "Creating directory #{dir_}"
         FileUtils.mkdir_p File.join(dir, dir_)
       end
 
-      write(File.join(dir, 'models', 'model.rb'), "# frozen_string_literal: true\n\nclass Model < Radical::Model\nend")
-      write(File.join(dir, 'controllers', 'controller.rb'), "# frozen_string_literal: true\n\nclass Controller < Radical::Controller\nend")
-      write(File.join(dir, '.env'), "RADICAL_ENV=development\nSESSION_SECRET=#{SecureRandom.hex(32)}\nDATABASE_URL=development.sqlite3")
-
-      Dir[File.join(__dir__, 'generator', 'app', '*.*')].sort.each do |template|
-        filename = File.join(dir, File.basename(template))
-        contents = File.read template
+      Dir[File.join(__dir__, 'generator', 'app', '**', '*.*')].sort.each do |template|
+        contents = File.read(template)
+        filename = File.join(dir, File.path(template).gsub("#{__dir__}/generator/app/", ''))
 
         write(filename, contents)
       end
+
+      # Explicitly include .env
+      template = File.join(__dir__, 'generator', 'app', '.env')
+      contents = instance_eval File.read(template)
+      filename = File.join(dir, '.env')
+      write(filename, contents)
     end
 
     private
@@ -92,6 +97,7 @@ module Radical
         puts "Skipped #{File.basename(filename)}"
       else
         File.write(filename, contents)
+        puts "Created #{filename}"
       end
     end
 
