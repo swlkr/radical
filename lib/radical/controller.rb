@@ -8,6 +8,7 @@ require 'sorbet-runtime'
 require_relative 'view'
 require_relative 'env'
 require_relative 'form'
+require_relative 'strings'
 
 module Radical
   class Controller

@@ -2,6 +2,7 @@
 
 require 'fileutils'
 require 'securerandom'
+require_relative 'strings'
 
 module Radical
   class Generator
