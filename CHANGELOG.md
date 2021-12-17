@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
+# 1.2.0 (2021-12-17)
+
 - *Breaking* Support only one level of nested resources, make them shallow only
 - *Breaking* Move `db/migrations` to `migrations`
 - *Breaking* Change `<%== f.button 'Save' %>` to `<%== f.submit 'Save' %>`
