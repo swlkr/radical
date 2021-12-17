@@ -95,12 +95,12 @@ module Radical
     def action_from(controller:, model:)
       return if model.nil?
 
-      route_name = controller.class.route_name
+      path_name = model.class.table_name
 
       if model.saved?
-        controller.send(:"#{route_name}_path", model)
+        controller.send(:"#{path_name}_path", model)
       else
-        controller.send(:"#{route_name}_path")
+        controller.send(:"#{path_name}_path")
       end
     end
   end
