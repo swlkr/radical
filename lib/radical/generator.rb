@@ -104,11 +104,11 @@ module Radical
     end
 
     def singular
-      @name.gsub(/\(.*\)/, '').gsub(/([A-Z])/, '_\1')[1..].downcase
+      Strings.camel_case singular_constant
     end
 
     def plural
-      @name.gsub(/[)(]/, '').gsub(/([A-Z])/, '_\1')[1..].downcase
+      Strings.camel_case plural_constant
     end
 
     def columns(leading:)

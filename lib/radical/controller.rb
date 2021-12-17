@@ -31,7 +31,7 @@ module Radical
 
       sig { returns(String) }
       def route_name
-        to_s.split('::').last.gsub(/Controller$/, '').gsub(/([A-Z])/, '_\1')[1..-1].downcase
+        Strings.snake_case to_s.split('::').last.gsub(/Controller$/, '')
       end
 
       sig { params(actions: Symbol).void }
