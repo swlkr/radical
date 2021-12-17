@@ -88,7 +88,7 @@ module Radical
 
       if saved?
         sql = <<-SQL
-          update #{table_name} set #{save_columns.map { |c| "#{c}=?" }.join(',')}, updated_at = ? where id = ?
+          update #{table_name} set #{save_columns.map { |c| "#{c}=?" }.join(',')}#{save_columns.any? ? ',' : ''} updated_at = ? where id = ?
         SQL
 
         db.transaction do |t|
@@ -104,6 +104,8 @@ module Radical
             #{save_columns.map { '?' }.join(',')}
           )
         SQL
+
+        sql = "insert into #{table_name} default values" if values.empty?
 
         db.transaction do |t|
           t.execute sql, values
