@@ -88,6 +88,7 @@ module Radical
       template = File.join(__dir__, 'generator', 'app', '.env')
       contents = instance_eval File.read(template)
       filename = File.join(dir, '.env')
+
       write(filename, contents)
     end
 
@@ -103,19 +104,19 @@ module Radical
     end
 
     def singular_constant
-      @name.gsub(/\(.*\)/, '')
+      Strings.camel_case @name.gsub(/\(.*\)/, '')
     end
 
     def plural_constant
-      @name.gsub(/[)(]/, '')
+      Strings.camel_case @name.gsub(/[)(]/, '')
     end
 
     def singular
-      Strings.camel_case singular_constant
+      Strings.snake_case singular_constant
     end
 
     def plural
-      Strings.camel_case plural_constant
+      Strings.snake_case plural_constant
     end
 
     def columns(leading:)
