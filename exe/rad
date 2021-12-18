@@ -16,7 +16,7 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-generate = Radical::Generator.new(ARGV[2], ARGV.drop(3)) if %w[g generate].include?(ARGV.first)
+generate = Radical::Generator.new(ARGV[2], ARGV.drop(3))
 
 case ARGV[0..1]
 when %w[g mvc], %w[generate mvc]
