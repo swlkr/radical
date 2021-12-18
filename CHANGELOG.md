@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
+- *Breaking* Change convention to assume nothing about the plural/singular of controllers/models
+- *Breaking* Assume controllers have `_controller.rb` and `Controller` appended
 - Add all column types to migrations
 - Add unique, not null, check, and collate column options
 - Render any view from any controller
