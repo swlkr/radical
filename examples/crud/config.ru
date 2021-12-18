@@ -63,11 +63,11 @@ class Todos < Controller
     redirect todos_path
   end
 
+  private
+
   def todo
     @todo ||= Todo.find params['id']
   end
-
-  private
 
   def todo_params
     params.slice('name')
