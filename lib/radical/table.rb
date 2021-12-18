@@ -42,6 +42,10 @@ module Radical
       end
     end
 
+    def string(name, options = {limit: 255})
+      @columns << [name, 'varchar', column_options(options)].compact.join(' ').strip
+    end
+
     def timestamps
       @columns << "created_at integer not null default(strftime('%s', 'now'))"
       @columns << 'updated_at integer'
