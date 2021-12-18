@@ -12,23 +12,10 @@ Radical::Controller.prepend_view_path 'test'
 
 require_all 'controllers'
 
-class C < Radical::Controller
-end
-
-class D < Radical::Controller
-  def index
-    plain "c:#{params['c_id']}"
-  end
-
-  def show
-    plain "d:#{params['id']}"
-  end
-end
-
 class Routes < Radical::Routes
   root :Home
-  resources :Todos
-  resources :TodoItems
+  resources :Todo
+  resources :TodoItem
   resources :As, :B
 
   resource :Profile

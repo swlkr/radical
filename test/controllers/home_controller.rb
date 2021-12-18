@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Home < Radical::Controller
+class HomeController < Radical::Controller
   def index
     @page = 'home#index'
   end

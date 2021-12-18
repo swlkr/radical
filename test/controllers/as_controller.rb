@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class B < Radical::Controller
+class AsController < Radical::Controller
   def index; end
 end

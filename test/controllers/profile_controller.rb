@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Profile < Radical::Controller
+class ProfileController < Radical::Controller
   layout false
 
   def show; end

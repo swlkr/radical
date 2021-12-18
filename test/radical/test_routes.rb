@@ -6,7 +6,7 @@ require 'models/test_model'
 
 class M < TestModel; end
 
-class Ms < Radical::Controller
+class MsController < Radical::Controller
   def index; end
 
   def new; end
@@ -16,7 +16,7 @@ class Ms < Radical::Controller
   def edit; end
 end
 
-class Ns < Radical::Controller
+class NsController < Radical::Controller
   def new; end
 
   def show; end
@@ -24,15 +24,15 @@ class Ns < Radical::Controller
   def edit; end
 end
 
-class H < Radical::Controller
+class HController < Radical::Controller
   def index; end
 end
 
-class Fs < Radical::Controller
+class FsController < Radical::Controller
   def index; end
 end
 
-class Gs < Radical::Controller
+class GsController < Radical::Controller
   def index; end
 
   def show; end
@@ -42,7 +42,7 @@ class Gs < Radical::Controller
   def new; end
 end
 
-class Hs < Radical::Controller
+class HsController < Radical::Controller
   def index; end
 end
 
@@ -54,11 +54,11 @@ class TestRoutes < Minitest::Test
   def test_resource_paths
     Radical::Routes.resource :Ns
 
-    assert Ns.method_defined?(:new_ns_path)
-    assert Ns.method_defined?(:ns_path)
-    assert Ns.method_defined?(:edit_ns_path)
+    assert NsController.method_defined?(:new_ns_path)
+    assert NsController.method_defined?(:ns_path)
+    assert NsController.method_defined?(:edit_ns_path)
 
-    n = Ns.new Rack::Request.new({})
+    n = NsController.new Rack::Request.new({})
 
     assert_equal '/ns', n.send(:ns_path)
     assert_equal '/ns/edit', n.send(:edit_ns_path)
@@ -68,11 +68,11 @@ class TestRoutes < Minitest::Test
   def test_resources_paths
     Radical::Routes.resources :Ms
 
-    assert Ms.method_defined?(:new_ms_path)
-    assert Ms.method_defined?(:ms_path)
-    assert Ms.method_defined?(:edit_ms_path)
+    assert MsController.method_defined?(:new_ms_path)
+    assert MsController.method_defined?(:ms_path)
+    assert MsController.method_defined?(:edit_ms_path)
 
-    m = Ms.new Rack::Request.new({})
+    m = MsController.new Rack::Request.new({})
     @m = M.new(id: 123)
 
     assert_equal '/ms', m.send(:ms_path)
@@ -84,9 +84,9 @@ class TestRoutes < Minitest::Test
   def test_root_path
     Radical::Routes.root :H
 
-    assert H.method_defined?(:h_path)
+    assert HController.method_defined?(:h_path)
 
-    h = H.new Rack::Request.new({})
+    h = HController.new Rack::Request.new({})
 
     assert_equal '/', h.send(:h_path)
   end
@@ -96,15 +96,15 @@ class TestRoutes < Minitest::Test
       Radical::Routes.resources :Gs
     end
 
-    assert Fs.method_defined?(:fs_path)
-    assert !Fs.method_defined?(:new_fs_path)
-    assert Gs.method_defined?(:fs_gs_path)
-    assert Gs.method_defined?(:new_fs_gs_path)
+    assert FsController.method_defined?(:fs_path)
+    assert !FsController.method_defined?(:new_fs_path)
+    assert GsController.method_defined?(:fs_gs_path)
+    assert GsController.method_defined?(:new_fs_gs_path)
 
     req = Rack::Request.new({})
 
-    fs = Fs.new req
-    gs = Gs.new req
+    fs = FsController.new req
+    gs = GsController.new req
     f = F.new(id: 123)
     g = G.new(id: 321)
 

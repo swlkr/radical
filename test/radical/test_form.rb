@@ -10,7 +10,6 @@ module Radical
   end
 
   class TestFormModel < TestModel
-    table 'test_forms'
   end
 
   class TestForm < Minitest::Test

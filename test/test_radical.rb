@@ -18,31 +18,31 @@ class RadicalTest < Minitest::Test
   end
 
   def test_returns_200_when_route_is_found
-    get '/todos'
+    get '/todo'
 
     assert last_response.ok?
-    assert_equal 'todos#index', last_response.body
+    assert_equal 'todo#index', last_response.body
   end
 
   def test_routes_to_long_controller_name
-    get '/todo_items/new'
+    get '/todo_item/new'
 
     assert last_response.ok?
-    assert_equal 'todo_items#new', last_response.body
+    assert_equal 'todo_item#new', last_response.body
   end
 
   def test_params
-    get '/todos/2/edit'
+    get '/todo/2/edit'
 
     assert last_response.ok?
-    assert_equal 'todos#edit { id: 2 }', last_response.body
+    assert_equal 'todo#edit { id: 2 }', last_response.body
   end
 
   def test_params_with_underscores
-    get '/todos/abc_xyz/edit'
+    get '/todo/abc_xyz/edit'
 
     assert last_response.ok?
-    assert_equal 'todos#edit { id: abc_xyz }', last_response.body
+    assert_equal 'todo#edit { id: abc_xyz }', last_response.body
   end
 
   def test_nested_shallow_routes
