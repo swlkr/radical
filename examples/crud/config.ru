@@ -6,14 +6,13 @@ Radical::Database.prepend_migrations_path '/var/app/examples/crud'
 Radical::Database.migrate!
 
 class Todo < Radical::Model
-  table 'todos'
 end
 
 class Controller < Radical::Controller
   prepend_view_path '/var/app/examples/crud'
 end
 
-class Todos < Controller
+class TodoController < Controller
   # GET /todos
   def index
     @todos = Todo.all
@@ -32,8 +31,7 @@ class Todos < Controller
     @todo = Todo.new(todo_params)
 
     if @todo.save
-      flash[:success] = 'Todo saved successfully'
-      redirect todos_path
+      redirect todo_path, notice: 'Todo saved'
     else
       view :new
     end
@@ -45,8 +43,7 @@ class Todos < Controller
   # PUT or PATCH /todos/:id
   def update
     if todo.update(todo_params)
-      flash[:success] = 'Todo updated successfully'
-      redirect todos_path
+      redirect todo_path, notice: 'Todo updated'
     else
       view :edit
     end
@@ -54,13 +51,9 @@ class Todos < Controller
 
   # DELETE /todos/:id
   def destroy
-    if todo.delete
-      flash[:success] = 'Todo deleted successfully'
-    else
-      flash[:error] = 'Todo could not be deleted'
-    end
+    todo.delete
 
-    redirect todos_path
+    redirect todo_path, notice: 'Todo deleted'
   end
 
   private
@@ -75,7 +68,7 @@ class Todos < Controller
 end
 
 class Routes < Radical::Routes
-  resources :Todos
+  resources :Todo
 end
 
 class App < Radical::App

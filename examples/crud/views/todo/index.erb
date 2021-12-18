@@ -1,4 +1,4 @@
-<a href="<%= new_todos_path %>">New todo</a>
+<a href="<%= new_todo_path %>">New todo</a>
 
 <table>
   <thead>
@@ -14,8 +14,8 @@
         <td><%= todo.name %></td>
         <td><%= todo.done_at %></td>
         <td>
-          <a href="<%= todos_path(todo) %>">show</a>
-          <a href="<%= edit_todos_path(todo) %>">edit</a>
+          <a href="<%= todo_path(todo) %>">show</a>
+          <a href="<%= edit_todo_path(todo) %>">edit</a>
           <%== form model: todo, method: :delete do |f| %>
             <%== f.submit 'delete' %>
           <% end %>
