@@ -1,11 +1,10 @@
 FROM docker.io/library/ruby:slim
 
 RUN apt-get update -qq
-RUN apt-get install -y build-essential libsqlite3-dev git-core
-
-RUN apt-get install -y --no-install-recommends libjemalloc2
+RUN apt-get install -y --no-install-recommends build-essential libsqlite3-dev git-core libjemalloc2
 RUN rm -rf /var/lib/apt/lists/*
 
+ENV LANG=C.UTF-8
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 
 ARG USER=app
