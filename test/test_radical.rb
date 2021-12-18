@@ -62,18 +62,12 @@ class RadicalTest < Minitest::Test
   def test_views
     get '/'
     assert last_response.ok?
-    assert '<html><h1>home#index</h1></html>', strip_encoding(last_response.body)
+    assert '<html><h1>home#index</h1></html>', last_response.body
   end
 
   def test_view_without_layout
     get '/profile'
     assert last_response.ok?
-    assert '<h1>profile#show</h1>', strip_encoding(last_response.body)
-  end
-
-  private
-
-  def strip_encoding(str)
-    str.split("\n").last
+    assert '<h1>profile#show</h1>', last_response.body
   end
 end
