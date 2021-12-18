@@ -145,6 +145,8 @@ module Radical
       end
     end
 
+    private
+
     def compiled_assets_path(assets, type)
       if type == :css
         link_tag(assets.compiled[:css])
@@ -164,8 +166,6 @@ module Radical
         end.join("\n")
       end
     end
-
-    private
 
     def emit(tag)
       @output = String.new if @output.nil?
