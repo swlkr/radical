@@ -18,7 +18,7 @@ module Radical
       def create_table(name, &block)
         return drop_table(name) if @change && @rollback
 
-        table = Table.new(name)
+        table = Table.new
 
         block.call(table)
 
