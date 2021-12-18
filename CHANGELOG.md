@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
+- Add all column types to migrations
+- Add unique, not null, check, and collate column options
 - Render any view from any controller
 - Fix update/insert when there aren't any columns
 - Fix forms with model attributes in other controllers' views
