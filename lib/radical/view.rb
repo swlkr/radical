@@ -22,24 +22,15 @@ module Radical
     class << self
       attr_accessor :_views_path, :_layout
 
-      def view_path!(dir, name)
-        filename = view_path(dir, name)
+      def view_path(name, controller = nil)
+        parts = name.split(File::SEPARATOR)
+        parts.unshift(controller.class.route_name) if parts.one? && controller
 
-        raise "Could not find view file: #{filename}. You need to create it." unless File.exist?(filename)
-
-        filename
+        "#{File.join(@_views_path || '.', 'views', *parts)}.erb"
       end
 
-      def view_path(dir, name)
-        File.join(@_views_path || '.', 'views', dir, "#{name}.erb")
-      end
-
-      def template(dir, name)
-        Tilt.new(view_path(dir, name), engine_class: CaptureEngine, escape_html: true)
-      end
-
-      def template!(dir, name)
-        Tilt.new(view_path!(dir, name), engine_class: CaptureEngine, escape_html: true)
+      def template(filename)
+        Tilt.new(filename, engine_class: CaptureEngine, escape_html: true)
       end
 
       def path(path = nil)
@@ -50,10 +41,20 @@ module Radical
         @_layout = name
       end
 
-      def render(dir, name, scope, options = {})
-        t = template!(dir, name)
+      def partial(name, scope, options = {})
+        render(name, scope, options.merge(layout: false))
+      end
 
-        layout = template('', @_layout || 'layout') unless options[:layout] == false
+      def render(name, scope, options = {})
+        filename = view_path(name, scope)
+
+        raise "Could not find view file: #{filename}. You need to create it." unless File.exist?(filename)
+
+        t = template(filename)
+
+        layout_path = view_path(options[:layout] || @_layout || 'layout')
+
+        layout = template(layout_path) if options[:layout] != false && File.exist?(layout_path)
 
         if layout
           layout.render scope, {} do

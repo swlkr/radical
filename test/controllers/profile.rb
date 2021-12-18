@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Profile < Radical::Controller
-  def index
-  end
+  layout false
+
+  def show; end
 end
