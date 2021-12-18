@@ -21,14 +21,14 @@ Put this inside of the `config.ru`
 ```rb
 require 'radical'
 
-class Home < Radical::Controller
+class HomeController < Radical::Controller
   def index
     plain '/'
   end
 end
 
 class Routes < Radical::Routes
-  root :Home
+  root :HomeController
 end
 
 class App < Radical::App
