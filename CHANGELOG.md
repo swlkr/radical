@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
+- Render any view from any controller
+- Fix update/insert when there aren't any columns
+- Fix forms with model attributes in other controllers' views
+
 # 1.2.0 (2021-12-17)
 
 - *Breaking* Support only one level of nested resources, make them shallow only
