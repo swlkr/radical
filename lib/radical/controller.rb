@@ -119,9 +119,10 @@ module Radical
       end
     end
 
-    sig { params(to: T.any(Symbol, String)).returns(Rack::Response) }
-    def redirect(to)
+    sig { params(to: T.any(Symbol, String), options: Hash).returns(Rack::Response) }
+    def redirect(to, options = {})
       to = self.class.action_to_url(to) if to.is_a?(Symbol)
+      options.each { |k, v| flash[k] = v }
 
       Rack::Response.new(nil, 302, { 'Location' => to })
     end
