@@ -38,6 +38,8 @@ require_relative 'security_headers'
 module Radical
   class App
     class << self
+      attr_writer :serve_assets
+
       def routes(route_class)
         @routes = route_class
       end
@@ -53,7 +55,7 @@ module Radical
       end
 
       def serve_assets
-        @serve_assets = true
+        @serve_assets || env.development?
       end
 
       def security_headers(headers = {})

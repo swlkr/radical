@@ -7,12 +7,12 @@ class Controller < Radical::Controller
   layout 'layout'
 end
 
-class Home < Controller
+class HomeController < Controller
   def index; end
 end
 
 class Routes < Radical::Routes
-  root :Home
+  root :HomeController
 end
 
 class App < Radical::App
