@@ -42,6 +42,11 @@ module Radical
       end
     end
 
+    def timestamps
+      @columns << "created_at integer not null default(strftime('%s', 'now'))"
+      @columns << 'updated_at integer'
+    end
+
     private
 
     def column_options(options = {})
@@ -55,11 +60,6 @@ module Radical
       parts << "collate #{options[:collate]}" if options[:collate]
 
       parts.join(' ')
-    end
-
-    def timestamps
-      @columns << "created_at integer not null default(strftime('%s', 'now'))"
-      @columns << 'updated_at integer'
     end
   end
 end

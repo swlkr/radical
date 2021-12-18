@@ -12,10 +12,24 @@ module Radical
     end
 
     def mvc
+      route
       migration
       model
       views
       controller
+    end
+
+    def route
+      file = File.join Dir.pwd, 'routes.rb'
+      lines = File.readlines(file)
+      end_index = lines.find_index { |line| line.start_with?('end') }
+      lines.insert(end_index, "  resources :#{plural_constant}")
+
+      File.open(file, 'r+') do |f|
+        lines.each do |line|
+          f.puts line
+        end
+      end
     end
 
     def migration(model: true)
@@ -23,7 +37,7 @@ module Radical
       FileUtils.mkdir_p dir
 
       template = instance_eval File.read(File.join(__dir__, 'generator', "#{model ? '' : 'blank_'}migration.rb"))
-      migration_name = model ? "#{Time.now.to_i}_create_table_#{plural}.rb" : "#{Time.now.to_i}_#{@name}.rb"
+      migration_name = model ? "#{Time.now.to_i}_create_table_#{plural}.rb" : "#{Time.now.to_i}_#{plural}.rb"
       filename = File.join(dir, migration_name)
 
       write(filename, template)
@@ -88,7 +102,6 @@ module Radical
       template = File.join(__dir__, 'generator', 'app', '.env')
       contents = instance_eval File.read(template)
       filename = File.join(dir, '.env')
-
       write(filename, contents)
     end
 
@@ -104,11 +117,11 @@ module Radical
     end
 
     def singular_constant
-      Strings.camel_case @name.gsub(/\(.*\)/, '')
+      @name.gsub(/\(.*\)/, '')
     end
 
     def plural_constant
-      Strings.camel_case @name.gsub(/[)(]/, '')
+      @name.gsub(/[)(]/, '')
     end
 
     def singular

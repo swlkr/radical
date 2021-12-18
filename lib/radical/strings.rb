@@ -10,6 +10,8 @@ module Radical
       end
 
       def camel_case(str)
+        return str if str.include?('_')
+
         str.split('_').map(&:capitalize).join
       end
     end
