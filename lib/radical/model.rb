@@ -14,6 +14,10 @@ module Radical
         Database.connection
       end
 
+      def table(name)
+        @table_name = name
+      end
+
       def table_name
         @table_name || Strings.snake_case(to_s)
       end
