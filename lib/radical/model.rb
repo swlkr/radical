@@ -1,20 +1,21 @@
 # frozen_string_literal: true
 
 require_relative 'database'
+require_relative 'strings'
 
 module Radical
   class ModelNotFound < StandardError; end
 
   class Model
     class << self
-      attr_accessor :table_name
+      attr_writer :table_name
 
       def db
         Database.connection
       end
 
-      def table(name)
-        self.table_name = name
+      def table_name
+        @table_name || Strings.snake_case(to_s)
       end
 
       def columns
