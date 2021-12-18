@@ -1,19 +1,25 @@
 <<~ERB
-  <a href="<%= new_#{plural}_path %>">New #{singular}</a>
+  <a href="<%= new_#{snake_case}_path %>">New #{camel_case}</a>
 
   <table>
     <thead>
-      #{th(leading: 6)}
+      #{th(leading: 4)}
+      <th></th>
+      <th></th>
       <th></th>
     </thead>
     <tbody>
-      <% @#{plural}.each do |#{singular}| %>
+      <% @#{snake_case}s.each do |#{snake_case}| %>
         <tr>
-          #{td(leading: 10)}
+          #{td(leading: 8)}
           <td>
-            <a href="<%= #{plural}_path(#{singular}) %>">show</a>
-            <a href="<%= edit_#{plural}_path(#{singular}) %>">edit</a>
-            <%== form model: #{singular}, method: :delete do |f| %>
+            <a href="<%= #{snake_case}_path(#{snake_case}) %>">show</a>
+          </td>
+          <td>
+            <a href="<%= edit_#{snake_case}_path(#{snake_case}) %>">edit</a>
+          </td>
+          <td>
+            <%== form model: #{snake_case}, method: :delete do |f| %>
               <%== f.submit 'delete' %>
             <% end %>
           </td>

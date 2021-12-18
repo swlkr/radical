@@ -1,9 +1,9 @@
 <<~RB
   # frozen_string_literal: true
 
-  class CreateTable#{plural_constant} < Radical::Migration
+  class CreateTable#{camel_case} < Radical::Migration
     change do
-      create_table :#{plural} do |t|
+      create_table :#{snake_case} do |t|
         #{columns(leading: 8)}
 
         t.timestamps

@@ -23,7 +23,7 @@ module Radical
       file = File.join Dir.pwd, 'routes.rb'
       lines = File.readlines(file)
       end_index = lines.find_index { |line| line.start_with?('end') }
-      lines.insert(end_index, "  resources :#{plural_constant}")
+      lines.insert(end_index, "  resources :#{camel_case}")
 
       File.open(file, 'r+') do |f|
         lines.each do |line|
@@ -37,7 +37,7 @@ module Radical
       FileUtils.mkdir_p dir
 
       template = instance_eval File.read(File.join(__dir__, 'generator', "#{model ? '' : 'blank_'}migration.rb"))
-      migration_name = model ? "#{Time.now.to_i}_create_table_#{plural}.rb" : "#{Time.now.to_i}_#{plural}.rb"
+      migration_name = model ? "#{Time.now.to_i}_create_table_#{snake_case}.rb" : "#{Time.now.to_i}_#{snake_case}.rb"
       filename = File.join(dir, migration_name)
 
       write(filename, template)
@@ -47,7 +47,7 @@ module Radical
       template = instance_eval File.read File.join(__dir__, 'generator', 'model.rb')
       dir = File.join(Dir.pwd, 'models')
       FileUtils.mkdir_p dir
-      filename = File.join(dir, "#{singular}.rb")
+      filename = File.join(dir, "#{snake_case}.rb")
 
       write(filename, template)
     end
@@ -56,13 +56,13 @@ module Radical
       template = instance_eval File.read File.join(__dir__, 'generator', 'controller.rb')
       dir = File.join(Dir.pwd, 'controllers')
       FileUtils.mkdir_p dir
-      filename = File.join(dir, "#{plural}.rb")
+      filename = File.join(dir, "#{snake_case}_controller.rb")
 
       write(filename, template)
     end
 
     def views
-      dir = File.join(Dir.pwd, 'views', plural)
+      dir = File.join(Dir.pwd, 'views', snake_case)
       FileUtils.mkdir_p dir
 
       Dir[File.join(__dir__, 'generator', 'views', '*.rb')].sort.each do |template|
@@ -86,14 +86,14 @@ module Radical
         migrations
         models
         views
-      ].each do |dir_|
-        puts "Creating directory #{dir_}"
-        FileUtils.mkdir_p File.join(dir, dir_)
+      ].each do |d|
+        puts "Creating directory #{d}"
+        FileUtils.mkdir_p File.join(dir, d)
       end
 
       Dir[File.join(__dir__, 'generator', 'app', '**', '*.*')].sort.each do |template|
         contents = File.read(template)
-        filename = File.join(dir, File.path(template).gsub("#{__dir__}/generator/app/", ''))
+        filename = File.join(dir, File.path(template).gsub("#{__dir__}#{File::SEPARATOR}generator#{File::SEPARATOR}app#{File::SEPARATOR}", ''))
 
         write(filename, contents)
       end
@@ -116,48 +116,44 @@ module Radical
       end
     end
 
-    def singular_constant
-      @name.gsub(/\(.*\)/, '')
+    def camel_case
+      Strings.camel_case @name
     end
 
-    def plural_constant
-      @name.gsub(/[)(]/, '')
-    end
-
-    def singular
-      Strings.snake_case singular_constant
-    end
-
-    def plural
-      Strings.snake_case plural_constant
+    def snake_case
+      Strings.snake_case @name
     end
 
     def columns(leading:)
       @props
         .map { |p| p.split(':') }
         .map { |name, type| "t.#{type} #{name}" }
-        .join "#{' ' * leading}\n"
+        .join "\n#{' ' * leading}"
     end
 
     def th(leading:)
-      @props
+      props = @props + %w[id created_at updated_at]
+
+      props
         .map { |p| p.split(':').first }
         .map { |name| "<th>#{name}</th>" }
-        .join "#{' ' * leading}\n"
+        .join "\n#{' ' * leading}"
     end
 
     def td(leading:)
-      @props
+      props = @props + %w[id created_at updated_at]
+
+      props
         .map { |p| p.split(':').first }
-        .map { |name| "<td><%= #{singular}.#{name} %></td>" }
-        .join "#{' ' * leading}\n"
+        .map { |name| "<td><%= #{snake_case}.#{name} %></td>" }
+        .join "\n#{' ' * leading}"
     end
 
     def inputs(leading:)
       @props
         .map { |p| p.split(':').first }
         .map { |name| "<%== f.text :#{name} %>" }
-        .join "#{' ' * leading}\n"
+        .join "\n#{' ' * leading}"
     end
 
     def params

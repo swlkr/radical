@@ -3,57 +3,51 @@
 <<~RB
   # frozen_string_literal: true
 
-  class #{plural_constant} < Controller
+  class #{camel_case}Controller < Controller
     def index
-      @#{plural} = #{singular_constant}.all
+      @#{snake_case}s = #{camel_case}.all
     end
 
     def show; end
 
     def new
-      @#{singular} = #{singular_constant}.new
+      @#{snake_case} = #{camel_case}.new
     end
 
     def create
-      @#{singular} = #{singular_constant}.new(#{singular}_params)
+      @#{snake_case} = #{camel_case}.new(#{snake_case}_params)
 
-      if @#{singular}.save
-        flash[:success] = '#{singular_constant} created'
-        redirect #{plural}_path
+      if @#{snake_case}.save
+        redirect #{snake_case}_path, notice: '#{camel_case} created'
       else
-        render :new
+        view :new
       end
     end
 
     def edit; end
 
     def update
-      if #{singular}.update(#{singular}_params)
-        flash[:success] = '#{singular_constant} updated'
-        redirect #{plural}_path
+      if #{snake_case}.update(#{snake_case}_params)
+        redirect #{snake_case}_path, notice: '#{camel_case} updated'
       else
-        render :edit
+        view :edit
       end
     end
 
     def destroy
-      if #{singular}.destroy
-        flash[:success] = '#{singular_constant} destroyed'
-      else
-        flash[:error] = 'Error destroying #{singular_constant}'
-      end
+      #{snake_case}.delete
 
-      redirect #{plural}_path
+      redirect #{snake_case}_path, notice: '#{camel_case} deleted'
     end
 
     private
 
-    def #{singular}_params
-      params['#{singular}'].slice(#{params})
+    def #{snake_case}_params
+      params.slice(#{params})
     end
 
-    def #{singular}
-      @#{singular} = #{singular_constant}.find(params['id'])
+    def #{snake_case}
+      @#{snake_case} = #{camel_case}.find params['id']
     end
   end
 RB

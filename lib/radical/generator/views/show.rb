@@ -1,5 +1,28 @@
 <<~ERB
-  <%= #{singular}.name %>
+  <a href="<%= new_#{snake_case}_path %>">New #{camel_case}</a>
 
-  <a href="<%== #{plural}_path %>">Index</a>
+  <table>
+    <thead>
+      #{th(leading: 4)}
+      <th></th>
+      <th></th>
+      <th></th>
+    </thead>
+    <tbody>
+      <tr>
+        #{td(leading: 8)}
+        <td>
+          <a href="<%= #{snake_case}_path %>">index</a>
+        </td>
+        <td>
+          <a href="<%= edit_#{snake_case}_path(#{snake_case}) %>">edit</a>
+        </td>
+        <td>
+          <%== form model: #{snake_case}, method: :delete do |f| %>
+            <%== f.submit 'delete' %>
+            <% end %>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 ERB

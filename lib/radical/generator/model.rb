@@ -3,7 +3,6 @@
 <<~RB
   # frozen_string_literal: true
 
-  class #{singular_constant} < Model
-    table '#{plural}'
+  class #{camel_case} < Model
   end
 RB
