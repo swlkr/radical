@@ -22,9 +22,15 @@ module Radical
     class << self
       attr_accessor :_views_path, :_layout
 
+      def parts(name, controller = nil)
+        p = name.split(File::SEPARATOR)
+        p.unshift(controller.class.route_name) if p.one? && controller
+
+        p
+      end
+
       def view_path(name, controller = nil)
-        parts = name.split(File::SEPARATOR)
-        parts.unshift(controller.class.route_name) if parts.one? && controller
+        parts = parts(name, controller)
 
         "#{File.join(@_views_path || '.', 'views', *parts)}.erb"
       end
@@ -42,7 +48,10 @@ module Radical
       end
 
       def partial(name, scope, options = {})
-        render(name, scope, options.merge(layout: false))
+        parts = parts(name, scope)
+        parts[parts.size - 1] = "_#{parts.last}"
+
+        render(parts.join(File::SEPARATOR), scope, options.merge(layout: false))
       end
 
       def render(name, scope, options = {})
@@ -61,7 +70,7 @@ module Radical
             t.render scope, options[:locals] || {}
           end
         else
-          t.render scope
+          t.render scope, options[:locals] || {}
         end
       end
     end
