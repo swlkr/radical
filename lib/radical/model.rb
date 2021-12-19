@@ -49,6 +49,32 @@ module Radical
 
         rows.map { |r| new(r) }
       end
+
+      def many(sym)
+        @many ||= []
+        @many << sym
+
+        name = Strings.snake_case sym.to_s
+        # TODO: do i really need inflections?
+        define_method :"#{name}s" do
+          Query.new(sym)
+        end
+      end
+
+      def one(sym)
+        @one ||= []
+        @one << sym
+
+        name = Strings.snake_case sym.to_s
+
+        define_method :"#{name}" do
+          Query.new(sym)
+        end
+      end
+
+      def where(string_or_hash, *params)
+        Query.new(to_s).where(string_or_hash, *params)
+      end
     end
 
     def initialize(params = {})
