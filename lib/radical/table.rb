@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'strings'
+
 module Radical
   class Table
     attr_accessor :columns
@@ -44,13 +46,23 @@ module Radical
       end
     end
 
-    def string(name, options = {limit: 255})
-      @columns << [name, 'varchar', column_options(options)].compact.join(' ').strip
+    def string(name, options = {})
+      varchar(name, { limit: 255 }.merge(options))
     end
 
     def timestamps
-      @columns << "created_at integer not null default(strftime('%s', 'now'))"
-      @columns << 'updated_at integer'
+      integer('created_at', null: false, default: "strftime('%s', 'now')")
+      integer('updated_at')
+    end
+
+    def references(model_sym, options = {})
+      table_name = Strings.snake_case model_sym.to_s
+
+      integer("#{table_name}_id", options)
+      @columns << [
+        "foreign key(#{table_name}_id) references #{table_name}(id)",
+        column_options(options)
+      ].compact.join(' ').strip
     end
 
     private
@@ -61,9 +73,11 @@ module Radical
       parts << "(#{options[:limit]})" if options[:limit]
       parts << 'unique' if options[:unique]
       parts << 'not null' if options[:null] == false
-      parts << "default #{options[:default]}" if options[:default]
+      parts << "default(#{options[:default]})" if options[:default]
       parts << "check(#{options[:check]})" if options[:check]
       parts << "collate #{options[:collate]}" if options[:collate]
+      parts << "on delete #{options[:on_delete]}" if options[:on_delete]
+      parts << "on update #{options[:on_update]}" if options[:on_update]
 
       parts.join(' ')
     end
