@@ -52,7 +52,7 @@ class G < TestModel; end
 
 class TestRoutes < Minitest::Test
   def test_resource_paths
-    Radical::Routes.resource :Ns
+    Radical::Routes.resource :NsController
 
     assert NsController.method_defined?(:new_ns_path)
     assert NsController.method_defined?(:ns_path)
@@ -66,7 +66,7 @@ class TestRoutes < Minitest::Test
   end
 
   def test_resources_paths
-    Radical::Routes.resources :Ms
+    Radical::Routes.resources :MsController
 
     assert MsController.method_defined?(:new_ms_path)
     assert MsController.method_defined?(:ms_path)
@@ -82,7 +82,7 @@ class TestRoutes < Minitest::Test
   end
 
   def test_root_path
-    Radical::Routes.root :H
+    Radical::Routes.root :HController
 
     assert HController.method_defined?(:h_path)
 
@@ -92,8 +92,8 @@ class TestRoutes < Minitest::Test
   end
 
   def test_nested_paths
-    Radical::Routes.resources :Fs do
-      Radical::Routes.resources :Gs
+    Radical::Routes.resources :FsController do
+      Radical::Routes.resources :GsController
     end
 
     assert FsController.method_defined?(:fs_path)

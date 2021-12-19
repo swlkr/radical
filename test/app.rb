@@ -13,15 +13,15 @@ Radical::Controller.prepend_view_path 'test'
 require_all 'controllers'
 
 class Routes < Radical::Routes
-  root :Home
-  resources :Todo
-  resources :TodoItem
-  resources :As, :B
+  root :HomeController
+  resources :TodoController
+  resources :TodoItemController
+  resources :AsController, :BController
 
-  resource :Profile
+  resource :ProfileController
 
-  resources :C do
-    resources :D
+  resources :CController do
+    resources :DController
   end
 end
 
