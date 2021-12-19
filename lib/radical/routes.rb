@@ -34,9 +34,9 @@ module Radical
 
       sig { params(names: T.any(String, Symbol), block: T.nilable(T.proc.void)).void }
       def resources(*names, &block)
-        names.each do |name|
-          klass = Object.const_get name
+        classes = names.map { |n| Object.const_get n }
 
+        classes.each do |klass|
           if parents.any?
             router.add_resources(klass, parents: @parents)
 
