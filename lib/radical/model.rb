@@ -32,22 +32,24 @@ module Radical
         columns.reject { |c| %w[id created_at updated_at].include?(c) }
       end
 
-      def find(id)
-        sql = "select * from #{table_name} where id = ? limit 1"
-
-        row = db.get_first_row sql, [id.to_i]
+      def find!(id)
+        row = Query.new(to_s).where(id: id.to_i).limit(1).first
 
         raise ModelNotFound, 'Record not found' unless row
 
-        new(row)
+        row
+      end
+
+      def find(id)
+        Query.new(to_s).where(id: id.to_i).limit(1).first
       end
 
       def all
-        sql = "select * from #{table_name} order by id"
+        Query.new(to_s).order('id desc').all
+      end
 
-        rows = db.execute sql
-
-        rows.map { |r| new(r) }
+      def count
+        Query.new(to_s).count
       end
 
       def many(sym)
@@ -75,11 +77,42 @@ module Radical
       def where(string_or_hash, *params)
         Query.new(to_s).where(string_or_hash, *params)
       end
+
+      def create(hash = {})
+        arr = hash.to_a
+
+        sql = if hash.empty?
+                "insert into '#{table_name}' default values"
+              else
+                "insert into '#{table_name}' ( #{arr.map(&:first).map { |_, s| "'#{s}'" }.join(', ')} ) values ( #{arr.map { '?' }.join(', ')} )"
+              end
+
+        params = arr.map(&:last)
+
+        result = nil
+
+        db.transaction do |t|
+          if params
+            t.execute sql, params
+          else
+            t.execute sql
+          end
+
+          result = find t.last_insert_row_id
+        end
+
+        result
+      end
+
+      def accessor?(column)
+        instance_methods.include?(column.to_sym) ||
+          instance_methods.include?(:"#{column}=")
+      end
     end
 
     def initialize(params = {})
       columns.each do |column|
-        self.class.attr_accessor column.to_sym
+        self.class.attr_accessor column.to_sym unless self.class.accessor?(column)
         instance_variable_set "@#{column}", (params[column] || params[column.to_sym])
       end
     end
@@ -155,6 +188,16 @@ module Radical
 
     def saved?
       !id.nil?
+    end
+
+    def to_h
+      result = {}
+
+      columns.each do |column|
+        result[column] = instance_variable_get "@#{column}"
+      end
+
+      result
     end
   end
 end

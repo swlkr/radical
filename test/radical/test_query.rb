@@ -3,10 +3,25 @@
 require 'minitest/autorun'
 require 'radical/query'
 
+class A < Radical::Model
+end
+
 module Radical
   class TestQuery < Minitest::Test
+    def self.run(*args)
+      super
+      File.delete 'test.sqlite3'
+    end
+
     def setup
-      @query = Query.new(:A)
+      Database.connection_string ||= 'test.sqlite3'
+      Database.connection.execute 'create table if not exists a ( id integer primary key )'
+
+      @query = Query.new :A
+    end
+
+    def teardown
+      Database.connection.execute 'delete from a'
     end
 
     def test_default_parts
@@ -31,6 +46,22 @@ module Radical
 
       assert_equal 'select * from a where type = ? limit 10', @query.to_sql
       assert_equal ['hero'], @query.params
+    end
+
+    def test_all
+      a = A.create
+
+      assert_equal a.to_h, A.all.first.to_h
+    end
+
+    def test_count
+      assert_equal 0, @query.count
+
+      2.times do
+        A.create
+      end
+
+      assert_equal 2, @query.count
     end
   end
 end

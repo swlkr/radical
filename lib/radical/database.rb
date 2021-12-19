@@ -17,7 +17,6 @@ module Radical
       def connection
         conn = SQLite3::Database.new(connection_string)
         conn.results_as_hash = true
-        conn.type_translation = true
 
         @connection ||= conn
       end
