@@ -98,7 +98,7 @@ module Radical
 
         db.transaction do |t|
           t.execute sql, values + [Time.now.to_i, id]
-          self.class.find(id)
+          reload! id
         end
       else
         sql = <<-SQL
@@ -114,8 +114,16 @@ module Radical
 
         db.transaction do |t|
           t.execute sql, values
-          self.class.find t.last_insert_row_id
+          reload! t.last_insert_row_id
         end
+      end
+    end
+
+    def reload!(id)
+      row = self.class.find id
+
+      self.class.columns.each do |column|
+        instance_variable_set "@#{column}", row.send(column)
       end
     end
 
