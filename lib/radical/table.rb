@@ -5,7 +5,9 @@ module Radical
     attr_accessor :columns
 
     def initialize
-      @columns = []
+      @columns = [
+        'id integer primary key'
+      ]
     end
 
     %w[

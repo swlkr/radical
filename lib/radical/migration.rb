@@ -22,7 +22,7 @@ module Radical
 
         block.call(table)
 
-        "create table #{name} ( id integer primary key, #{table.columns.join(',')} )"
+        "create table #{name} ( #{table.columns.join(',')} )"
       end
 
       def drop_table(name)
