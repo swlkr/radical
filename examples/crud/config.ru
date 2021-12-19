@@ -68,7 +68,7 @@ class TodoController < Controller
 end
 
 class Routes < Radical::Routes
-  resources :Todo
+  resources :TodoController
 end
 
 class App < Radical::App

@@ -2,14 +2,14 @@
 
 require '../../lib/radical'
 
-class Home < Radical::Controller
+class HomeController < Radical::Controller
   def index
     head :ok
   end
 end
 
 class Routes < Radical::Routes
-  root 'Home'
+  root :HomeController
 end
 
 class App < Radical::App

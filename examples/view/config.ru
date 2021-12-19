@@ -6,21 +6,21 @@ class Controller < Radical::Controller
   prepend_view_path '/var/app/examples/view'
 end
 
-class Home < Controller
+class HomeController < Controller
   def index
     @page = 'home#index'
   end
 end
 
-class About < Controller
+class AboutController < Controller
   def index
     @page = 'about#index'
   end
 end
 
 class Routes < Radical::Routes
-  root :Home
-  resources :About
+  root :HomeController
+  resources :AboutController
 end
 
 class App < Radical::App

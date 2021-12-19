@@ -4,7 +4,6 @@ require '../../lib/radical'
 
 class Controller < Radical::Controller
   prepend_view_path '/var/app/examples/assets'
-  layout 'layout'
 end
 
 class HomeController < Controller

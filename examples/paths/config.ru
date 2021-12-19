@@ -2,21 +2,21 @@
 
 require '../../lib/radical'
 
-class Home < Radical::Controller
+class HomeController < Radical::Controller
   def index
     redirect todos_path
   end
 end
 
-class Todos < Radical::Controller
+class TodosController < Radical::Controller
   def index
     plain '/todos'
   end
 end
 
 class Routes < Radical::Routes
-  root :Home
-  resources :Todos
+  root :HomeController
+  resources :TodosController
 end
 
 class App < Radical::App
