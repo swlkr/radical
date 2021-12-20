@@ -8,13 +8,8 @@ end
 
 module Radical
   class TestQuery < Minitest::Test
-    def self.run(*args)
-      super
-      File.delete 'test.sqlite3'
-    end
-
     def setup
-      Database.connection_string ||= 'test.sqlite3'
+      Database.connection_string ||= ':memory:'
       Database.connection.execute 'create table if not exists a ( id integer primary key )'
 
       @query = Query.new :A
