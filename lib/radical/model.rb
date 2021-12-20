@@ -2,6 +2,7 @@
 
 require_relative 'database'
 require_relative 'strings'
+require_relative 'query'
 
 module Radical
   class ModelNotFound < StandardError; end

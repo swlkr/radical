@@ -4,12 +4,14 @@ require_relative 'strings'
 
 module Radical
   class Table
-    attr_accessor :columns
+    attr_accessor :columns, :foreign_keys
 
     def initialize
       @columns = [
         'id integer primary key'
       ]
+
+      @foreign_keys = []
     end
 
     %w[
@@ -59,9 +61,10 @@ module Radical
       table_name = Strings.snake_case model_sym.to_s
 
       integer("#{table_name}_id", options)
-      @columns << [
+
+      @foreign_keys << [
         "foreign key(#{table_name}_id) references #{table_name}(id)",
-        column_options(options)
+        column_options(options.slice(:on_delete, :on_update))
       ].compact.join(' ').strip
     end
 
