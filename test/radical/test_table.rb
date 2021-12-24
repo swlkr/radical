@@ -53,7 +53,7 @@ module Radical
       @table.references :TodoItem
 
       assert_equal 'todo_item_id integer', @table.columns[1]
-      assert_equal 'foreign key(todo_item_id) references todo_item(id)', @table.columns[2]
+      assert_equal 'foreign key(todo_item_id) references todo_item(id)', @table.foreign_keys[0]
     end
 
     def test_string
