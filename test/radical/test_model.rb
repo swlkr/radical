@@ -5,7 +5,7 @@ require 'radical/model'
 
 module Radical
   class V < Model
-    no_table
+    table false
 
     validates do
       present :title

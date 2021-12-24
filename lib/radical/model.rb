@@ -11,8 +11,6 @@ module Radical
 
   class Model
     class << self
-      attr_accessor :_no_table
-
       def db
         Database.connection
       end
@@ -22,11 +20,9 @@ module Radical
       end
 
       def table_name
-        @table_name || Strings.snake_case(to_s)
-      end
+        return if @table_name == false
 
-      def no_table
-        self._no_table = true
+        @table_name || Strings.snake_case(to_s)
       end
 
       def columns
@@ -138,18 +134,11 @@ module Radical
     def initialize(params = {})
       @errors = {}
 
-      if self.class._no_table
-        params.each do |k, v|
-          self.class.attr_accessor k.to_sym unless self.class.accessor?(k)
-          instance_variable_set "@#{k}", v
-        end
+      params = params.transform_keys(&:to_s).slice(*columns.map(&:to_s)) if table_name
 
-        return
-      end
-
-      columns.each do |column|
-        self.class.attr_accessor column.to_sym unless self.class.accessor?(column)
-        instance_variable_set "@#{column}", (params[column] || params[column.to_sym])
+      params.each do |k, v|
+        self.class.attr_accessor k unless self.class.accessor?(k)
+        instance_variable_set "@#{k}", v
       end
     end
 
