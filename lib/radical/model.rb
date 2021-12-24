@@ -3,13 +3,15 @@
 require_relative 'database'
 require_relative 'strings'
 require_relative 'query'
+require_relative 'validator'
 
 module Radical
   class ModelNotFound < StandardError; end
+  class ModelInvalid < StandardError; end
 
   class Model
     class << self
-      attr_writer :table_name
+      attr_accessor :_no_table
 
       def db
         Database.connection
@@ -21,6 +23,10 @@ module Radical
 
       def table_name
         @table_name || Strings.snake_case(to_s)
+      end
+
+      def no_table
+        self._no_table = true
       end
 
       def columns
@@ -109,9 +115,38 @@ module Radical
         instance_methods.include?(column.to_sym) ||
           instance_methods.include?(:"#{column}=")
       end
+
+      def validations
+        @validations ||= []
+      end
+
+      def validates(&block)
+        block.call
+      end
+
+      def present(*attributes)
+        validations << [:present?] + attributes
+      end
+
+      def unique(*attributes)
+        validations << [:unique?] + attributes
+      end
     end
 
+    attr_accessor :errors
+
     def initialize(params = {})
+      @errors = {}
+
+      if self.class._no_table
+        params.each do |k, v|
+          self.class.attr_accessor k.to_sym unless self.class.accessor?(k)
+          instance_variable_set "@#{k}", v
+        end
+
+        return
+      end
+
       columns.each do |column|
         self.class.attr_accessor column.to_sym unless self.class.accessor?(column)
         instance_variable_set "@#{column}", (params[column] || params[column.to_sym])
@@ -146,6 +181,33 @@ module Radical
       save_columns.each { |c| instance_variable_set("@#{c}", params[c]) }
 
       save
+    end
+
+    def validate
+      self.class.validations.each do |validation|
+        method, *attributes = validation
+
+        attributes.each do |attr|
+          error = Validator.send(method, public_send(attr))
+          add_error(attribute: attr, message: error) if error
+        end
+      end
+    end
+
+    def add_error(attribute: nil, message: nil)
+      if @errors[attribute]
+        @errors[attribute] << message
+      else
+        @errors[attribute] = [message]
+      end
+    end
+
+    def valid?
+      @errors.empty?
+    end
+
+    def invalid?
+      !valid?
     end
 
     def save
