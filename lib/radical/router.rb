@@ -63,24 +63,24 @@ module Radical
       @routes = Hash.new { |hash, key| hash[key] = [] }
     end
 
-    sig { params(classes: T::Array[Class]).returns(String) }
+    sig { params(classes: T::Array[T.class_of(Controller)]).returns(String) }
     def route_prefix(classes)
       classes.map(&:route_name).map { |n| "#{n}/:#{n}_id" }.join('/')
     end
 
-    sig { params(klass: Class).void }
+    sig { params(klass: T.class_of(Controller)).void }
     def add_root(klass)
       add_routes(klass, name: '', actions: ACTIONS)
       add_root_paths(klass)
     end
 
-    sig { params(klass: Class).void }
+    sig { params(klass: T.class_of(Controller)).void }
     def add_resource(klass)
       add_routes(klass, actions: RESOURCE_ACTIONS)
       add_resource_paths(klass)
     end
 
-    sig { params(klass: Class, parents: T.nilable(T::Array[Class])).void }
+    sig { params(klass: T.class_of(Controller), parents: T.nilable(T::Array[T.class_of(Controller)])).void }
     def add_resources(klass, parents: nil)
       if parents
         parents.each do |scope|
@@ -105,7 +105,7 @@ module Radical
 
       klass, method = route.last
 
-      params.each do |k, v|
+      params&.each do |k, v|
         request.update_param(k, v)
       end
 
@@ -124,7 +124,7 @@ module Radical
 
     private
 
-    sig { params(klass: Class, actions: Array, name: T.nilable(String), scope: T.nilable(Class)).void }
+    sig { params(klass: T.class_of(Controller), actions: Array, name: T.nilable(String), scope: T.nilable(T.class_of(Controller))).void }
     def add_routes(klass, actions:, name: nil, scope: nil)
       name ||= klass.route_name
 
@@ -147,7 +147,7 @@ module Radical
       end
     end
 
-    sig { params(klass: Class).void }
+    sig { params(klass: T.class_of(Controller)).void }
     def add_root_paths(klass)
       route_name = klass.route_name
 
@@ -174,7 +174,7 @@ module Radical
       end
     end
 
-    sig { params(klass: Class).void }
+    sig { params(klass: T.class_of(Controller)).void }
     def add_resource_paths(klass)
       name = klass.route_name
 
@@ -197,7 +197,7 @@ module Radical
       end
     end
 
-    sig { params(klass: Class, scope: T.nilable(Class)).void }
+    sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller))).void }
     def add_resources_paths(klass, scope: nil)
       path_name = klass.route_name
       scope_path_name = [scope&.route_name, klass.route_name].compact.join('_')

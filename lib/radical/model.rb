@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 
 require_relative 'database'
@@ -7,30 +8,40 @@ require_relative 'validator'
 
 module Radical
   class ModelNotFound < StandardError; end
+
   class ModelInvalid < StandardError; end
 
   class Model
+    extend T::Sig
+
     class << self
+      extend T::Sig
+
+      sig { returns(SQLite3::Database) }
       def db
         Database.connection
       end
 
+      sig { params(name: T.any(String, Symbol, T::Boolean)).void }
       def table(name)
         @table_name = name
       end
 
+      sig { returns(T.nilable(String)) }
       def table_name
         return if @table_name == false
 
         @table_name || Strings.snake_case(to_s)
       end
 
+      sig { returns(T::Array[String]) }
       def columns
         sql = "select name from pragma_table_info('#{table_name}');"
 
         @columns ||= db.execute(sql).map { |r| r['name'] }
       end
 
+      sig { returns(T::Array[String]) }
       def save_columns
         columns.reject { |c| %w[id created_at updated_at].include?(c) }
       end
@@ -121,22 +132,25 @@ module Radical
       end
 
       def present(*attributes)
-        validations << [:present?] + attributes
+        validations << [[:present?], *attributes]
       end
 
-      def unique(*attributes)
-        validations << [:unique?] + attributes
+      def matches(regex, *attributes)
+        validations << [[:matches?, regex], *attributes]
       end
     end
 
     attr_accessor :errors
 
+    sig { params(params: Hash).void }
     def initialize(params = {})
       @errors = {}
 
-      params = params.transform_keys(&:to_s).slice(*columns.map(&:to_s)) if table_name
+      @params = params
+      @params.transform_keys!(&:to_s)
+      @params = @params.slice(*columns.map(&:to_s)) if table_name
 
-      params.each do |k, v|
+      @params.each do |k, v|
         self.class.attr_accessor k unless self.class.accessor?(k)
         instance_variable_set "@#{k}", v
       end
@@ -161,7 +175,7 @@ module Radical
     def delete
       sql = "delete from #{table_name} where id = ? limit 1"
 
-      db.execute sql, id.to_i
+      db.execute sql, @params['id']
 
       self
     end
@@ -174,10 +188,11 @@ module Radical
 
     def validate
       self.class.validations.each do |validation|
-        method, *attributes = validation
+        validator_arr, *attributes = validation
+        validator = Validator.new(*validator_arr)
 
         attributes.each do |attr|
-          error = Validator.send(method, public_send(attr))
+          error = validator.validate public_send(attr)
           add_error(attribute: attr, message: error) if error
         end
       end
@@ -199,7 +214,13 @@ module Radical
       !valid?
     end
 
-    def save
+    sig { params(skip_validations: T::Boolean).returns(T::Boolean) }
+    def save(skip_validations: false)
+      unless skip_validations
+        validate
+        return false if invalid?
+      end
+
       values = save_columns.map { |c| instance_variable_get("@#{c}") }
 
       if saved?
@@ -208,8 +229,8 @@ module Radical
         SQL
 
         db.transaction do |t|
-          t.execute sql, values + [Time.now.to_i, id]
-          reload! id
+          t.execute sql, values + [Time.now.to_i, @params['id']]
+          reload! @params['id']
         end
       else
         sql = <<-SQL
@@ -228,6 +249,16 @@ module Radical
           reload! t.last_insert_row_id
         end
       end
+
+      true
+    end
+
+    def save!
+      validate
+
+      raise ModelInvalid, "#{self} is invalid. Check the errors attribute" if invalid?
+
+      save
     end
 
     def reload!(id)

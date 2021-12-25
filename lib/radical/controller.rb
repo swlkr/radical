@@ -32,7 +32,7 @@ module Radical
 
       sig { returns(String) }
       def route_name
-        Strings.snake_case to_s.split('::').last.gsub(/Controller$/, '')
+        Strings.snake_case to_s.split('::').last&.gsub(/Controller$/, '')
       end
 
       sig { params(actions: Symbol).void }
@@ -55,6 +55,8 @@ module Radical
           "/#{route_name}/new"
         when :edit
           "/#{route_name}/:id/edit"
+        else
+          ''
         end
       end
 
@@ -69,6 +71,8 @@ module Radical
           'PATCH'
         when :destroy
           'DELETE'
+        else
+          ''
         end
       end
     end
