@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rack-test', '~> 1.1'
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'sorbet', '~> 0.5'
+  spec.add_development_dependency 'tapioca'
 
   spec.add_dependency 'brotli', '~> 0.4'
   spec.add_dependency 'erubi', '~> 1.10'
