@@ -86,10 +86,12 @@ module Radical
         parents.each do |scope|
           add_routes(klass, actions: ACTIONS, scope: scope)
           add_resources_paths(klass, scope: scope)
+          add_resources_urls(klass, scope: scope)
         end
       else
         add_routes(klass, actions: ACTIONS)
         add_resources_paths(klass)
+        add_resources_urls(klass)
       end
     end
 
@@ -144,6 +146,36 @@ module Radical
         path = Regexp.new("^#{path.gsub(/:(\w+)/, '(?<\1>[a-zA-Z0-9_]+)')}$").freeze
 
         @routes[http_method] << [path, [klass, method]]
+      end
+    end
+
+    sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller))).void }
+    def add_resources_urls(klass, scope: nil)
+      route_name = klass.route_name
+      scope_name = [scope&.route_name, klass.route_name].compact.join('_')
+
+      if %i[index create show update destroy].any? { |method| klass.method_defined?(method) }
+        if scope
+          Controller.define_method :"#{scope_name}_url" do |parent = nil|
+            [url_prefix, scope.route_name, parent&.id, route_name].join('/')
+          end
+        end
+
+        Controller.define_method :"#{route_name}_url" do |obj = nil|
+          [url_prefix, route_name, obj&.id].compact.join('/')
+        end
+      end
+
+      if klass.method_defined?(:new)
+        Controller.define_method :"new_#{scope_name || route_name}_url" do |parent = nil|
+          [url_prefix, scope&.route_name, parent&.id, route_name, 'new'].compact.join('/')
+        end
+      end
+
+      return unless klass.method_defined?(:edit)
+
+      Controller.define_method :"edit_#{route_name}_url" do |obj|
+        [url_prefix, route_name, obj.id, 'edit'].join('/')
       end
     end
 
