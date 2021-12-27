@@ -52,9 +52,11 @@ module Radical
         pending_migrations.each do |file|
           puts "Executing migration #{file}"
 
+          m = migration(file)
           v = version(file)
 
-          migration(file).migrate!(version: v)
+          execute m.migrate
+          execute 'insert into radical_migrations (version) values (?)', [v]
         end
       end
 
@@ -65,9 +67,11 @@ module Radical
 
         puts "Rolling back migration #{file}"
 
+        m = migration(file)
         v = version(file)
 
-        migration(file).rollback!(version: v)
+        execute m.rollback
+        execute 'delete from radical_migrations where version = ?', [v]
       end
 
       def applied_versions

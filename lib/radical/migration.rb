@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative 'database'
-
 module Radical
   class Migration
     class << self
@@ -31,16 +29,16 @@ module Radical
         "drop table #{name}"
       end
 
-      def migrate!(version:)
-        Database.execute @change&.call || @up&.call
-        Database.execute 'insert into radical_migrations (version) values (?)', [version]
+      def migrate
+        @rollback = false
+
+        @change&.call || @up&.call
       end
 
-      def rollback!(version:)
+      def rollback
         @rollback = true
 
-        Database.execute @change&.call || @down&.call
-        Database.execute 'delete from radical_migrations where version = ?', [version]
+        @change&.call || @down&.call
       end
     end
   end
