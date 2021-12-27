@@ -3,13 +3,5 @@
 require 'radical'
 
 class TestModel < Radical::Model
-  class << self
-    def db
-      true
-    end
-
-    def columns
-      ['id']
-    end
-  end
+  table false
 end
