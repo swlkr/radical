@@ -17,7 +17,7 @@ module Radical
     end
 
     def present?(val)
-      return unless val.nil? || val&.empty?
+      return unless val.nil? || val&.to_s&.empty?
 
       'is not present'
     end
