@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Render any view from any controller
 - Fix update/insert when there aren't any columns
 - Fix forms with model attributes in other controllers' views
+- Add query logging
+- Make many/one actually work
+- Bring in shopify/tapioca gem
+- Ignore modules in `Model#table_name`
 
 # 1.2.0 (2021-12-17)
 
