@@ -11,6 +11,7 @@ require_relative 'env'
 require_relative 'flash'
 require_relative 'routes'
 require_relative 'security_headers'
+require_relative 'middleware/logfmt_logger'
 
 # The main entry point for a Radical application
 #
@@ -86,7 +87,7 @@ module Radical
         session = @session || self.session
 
         @app ||= Rack::Builder.app do
-          use Rack::CommonLogger
+          use Middleware::LogfmtLogger
           use Rack::ShowExceptions if env.development?
           use Rack::Runtime
           use Rack::MethodOverride

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'logger'
 require 'sqlite3'
+require_relative 'logger'
 require_relative 'table'
 require_relative 'migration'
 
@@ -27,9 +27,12 @@ module Radical
       end
 
       def logger
-        return if @logger.nil?
+        return if @logger == false
 
-        @logger || Logger.new($stdout)
+        default_logger = Logger.new($stdout)
+        default_logger.progname = 'db'
+
+        @logger || default_logger
       end
 
       def db
@@ -98,24 +101,32 @@ module Radical
       end
 
       def transaction(&block)
-        connection.transaction(&block)
+        logger&.info 'Database transaction started'
+
+        if connection.transaction_active?
+          yield
+        else
+          connection.transaction(&block)
+        end
+
+        logger&.info 'Database transaction end'
       end
 
       def execute(sql, params = [])
         # TODO: logging options? maybe log4j?
-        logger&.info "#{sql} #{params.join(',')}"
+        logger&.info "#{sql} #{params}"
 
         connection.execute sql, params
       end
 
       def get_first_value(sql, params = [])
-        logger&.info "#{sql} #{params.join(',')}"
+        logger&.info "#{sql} #{params}"
 
         connection.get_first_value sql, params
       end
 
       def get_first_row(sql, params = [])
-        logger&.info "#{sql} #{params.join(',')}"
+        logger&.info "#{sql} #{params}"
 
         connection.get_first_row sql, params
       end

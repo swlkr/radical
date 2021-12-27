@@ -149,6 +149,12 @@ module Radical
       end
     end
 
+    def url_prefix
+      port = @request.port == 80 || @request.port == 443 ? '' : ":#{@request.port}"
+
+      "#{@request.scheme}://#{@request.host}#{port}"
+    end
+
     private
 
     def compiled_assets_path(assets, type)
