@@ -7,19 +7,24 @@ module Radical
   class Query
     attr_accessor :params
 
-    def initialize(model_sym)
-      @table_name = Strings.snake_case model_sym.to_s
-      @model_sym = model_sym
+    def initialize(record: nil, model: nil)
+      @record = record
+      @model = model
+      @table_name = Strings.snake_case model.table_name
       @params = []
       @parts = {
+        update: [],
+        set: [],
+        insert: [],
+        delete: [],
         select: ['*'],
         from: [@table_name],
         where: [],
         join: [],
-        offset: [],
-        limit: [],
         'order by' => [],
-        'group by' => []
+        'group by' => [],
+        offset: [],
+        limit: []
       }
     end
 
@@ -85,25 +90,67 @@ module Radical
       column = column.nil? ? '*' : [@table_name, column].map { |s| quote(s) }.join('.')
       @parts[:select] = "count(#{column})"
 
-      model = Object.const_get @model_sym
-
-      model.db.get_first_value to_sql, @params
+      Database.get_first_value to_sql, @params
     end
 
     def to_sql
-      @parts.reject { |_, v| v.nil? || v.empty? }.map { |k, v| "#{k} #{flat(v)}" }.join(' ')
+      @parts.reject { |_, v| v.nil? || v.empty? }.map { |k, v| "#{k} #{join_if_array(v)}".strip }.join(' ')
     end
 
     def all
-      model = Object.const_get @model_sym
-
-      rows.map { |r| model.new(r) }
+      rows.map { |r| @model.new(r) }
     end
 
     def first
-      model = Object.const_get @model_sym
+      row = Database.get_first_row to_sql, @params
 
-      model.new model.db.get_first_row(to_sql, @params)
+      @model.new row if row
+    end
+
+    def delete_all
+      @parts[:delete] << ''
+      @parts[:select] = []
+
+      Database.execute to_sql, @params
+    end
+
+    def update_all(params = {})
+      @parts[:update] << ''
+      @parts[:select] = []
+      params.each do |k, v|
+        @parts[:set] << k
+        @params << v
+      end
+
+      Database.execute to_sql, @params
+    end
+
+    def insert(params = {})
+      @parts[:select] = []
+      @parts[:insert] << "into #{@table_name}"
+      @parts[:from] = []
+
+      if params.empty?
+        @parts[:insert][0] += ' default values'
+      else
+        @parts[:insert][0] += " (#{params.keys.join(',')})"
+        @parts[:values] = "(#{params.keys.map { '?' }.join(',')})"
+      end
+
+      @params = params.values
+
+      Database.execute to_sql, @params
+    end
+
+    def create(params = {})
+      record = @model.new params.merge("#{@record.table_name}_id" => @record.id)
+      record.save
+
+      record
+    end
+
+    def each(&block)
+      all.each(&block)
     end
 
     private
@@ -112,7 +159,7 @@ module Radical
       "'#{str}'"
     end
 
-    def flat(could_be_array)
+    def join_if_array(could_be_array)
       if could_be_array.is_a?(Array)
         could_be_array.join(', ')
       else
@@ -121,7 +168,7 @@ module Radical
     end
 
     def rows
-      @rows ||= Database.connection.execute to_sql, @params
+      @rows ||= Database.execute to_sql, @params
     end
   end
 end

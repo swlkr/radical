@@ -46,50 +46,61 @@ module Radical
         columns.reject { |c| %w[id created_at updated_at].include?(c) }
       end
 
+      sig { params(id: T.any(String, Integer)).returns(Model) }
       def find!(id)
-        row = Query.new(to_s).where(id: id.to_i).limit(1).first
+        model = Query.new(model: self).where(id: id.to_i).limit(1).first
 
-        raise ModelNotFound, 'Record not found' unless row
+        raise ModelNotFound, 'Record not found' unless model
 
-        row
+        model
       end
 
+      sig { params(id: T.any(String, Integer)).returns(Model) }
       def find(id)
-        Query.new(to_s).where(id: id.to_i).limit(1).first
+        Query.new(model: self).where(id: id.to_i).limit(1).first
       end
 
+      sig { returns(T::Array[Model]) }
       def all
-        Query.new(to_s).order('id desc').all
+        Query.new(model: self).order('id desc').all
       end
 
+      sig { returns(Integer) }
       def count
-        Query.new(to_s).count
+        Query.new(model: self).count
       end
 
-      def many(sym)
+      sig { returns(Model) }
+      def first
+        Query.new(model: self).order('id').limit(1).first
+      end
+
+      def many(sym, options = {})
         @many ||= []
         @many << sym
 
-        name = Strings.snake_case sym.to_s
-        # TODO: do i really need inflections?
-        define_method :"#{name}s" do
-          Query.new(sym)
+        name = options[:as] || Strings.snake_case(sym.to_s)
+        model = Object.const_get(sym)
+
+        define_method :"#{name}" do
+          Query.new(model: model, record: self).where("#{table_name}_id" => send(:id))
         end
       end
 
-      def one(sym)
+      def one(sym, options = {})
         @one ||= []
         @one << sym
 
-        name = Strings.snake_case sym.to_s
+        name = options[:as] || Strings.snake_case(sym.to_s)
+        model = Object.const_get(sym)
 
         define_method :"#{name}" do
-          Query.new(sym)
+          Query.new(model: model, record: self).where("#{table_name}.id" => send(:"#{name}_id")).first
         end
       end
 
       def where(string_or_hash, *params)
-        Query.new(to_s).where(string_or_hash, *params)
+        Query.new(model: self).where(string_or_hash, *params)
       end
 
       def create(hash = {})
@@ -138,21 +149,27 @@ module Radical
       def matches(regex, *attributes)
         validations << [[:matches?, regex], *attributes]
       end
+
+      def delete_all
+        Query.new(model: self).delete_all
+      end
     end
 
-    attr_accessor :errors
+    attr_accessor :errors, :id
 
     sig { params(params: Hash).void }
     def initialize(params = {})
       @errors = {}
 
-      @params = params
-      @params.transform_keys!(&:to_s)
-      @params = @params.slice(*columns.map(&:to_s)) if table_name
+      @params = params.transform_keys(&:to_s)
+      @params.each do |column, value|
+        if value.is_a?(Model)
+          column = "#{column}_id"
+          value = value.id
+        end
 
-      @params.each do |k, v|
-        self.class.attr_accessor k unless self.class.accessor?(k)
-        instance_variable_set "@#{k}", v
+        self.class.attr_accessor column unless self.class.accessor?(column)
+        instance_variable_set "@#{column}", value
       end
     end
 
@@ -175,13 +192,22 @@ module Radical
     def delete
       sql = "delete from #{table_name} where id = ? limit 1"
 
-      db.execute sql, @params['id']
+      db.execute sql, id
 
       self
     end
 
     def update(params)
-      save_columns.each { |c| instance_variable_set("@#{c}", params[c]) }
+      params.transform_keys!(&:to_s)
+
+      params.each do |column, value|
+        if value.is_a?(Model)
+          column = "#{column}_id"
+          value = value.id
+        end
+
+        instance_variable_set "@#{column}", value
+      end
 
       save
     end
@@ -221,50 +247,27 @@ module Radical
         return false if invalid?
       end
 
-      values = save_columns.map { |c| instance_variable_get("@#{c}") }
+      insert_or_update
+    end
 
-      if saved?
-        sql = <<-SQL
-          update #{table_name} set #{save_columns.map { |c| "#{c}=?" }.join(',')}#{save_columns.any? ? ',' : ''} updated_at = ? where id = ?
-        SQL
-
-        db.transaction do |t|
-          t.execute sql, values + [Time.now.to_i, @params['id']]
-          reload! @params['id']
-        end
-      else
-        sql = <<-SQL
-          insert into #{table_name} (
-            #{save_columns.join(',')}
-          )
-          values (
-            #{save_columns.map { '?' }.join(',')}
-          )
-        SQL
-
-        sql = "insert into #{table_name} default values" if values.empty?
-
-        db.transaction do |t|
-          t.execute sql, values
-          reload! t.last_insert_row_id
-        end
+    def save!(skip_validations: false)
+      unless skip_validations
+        validate
+        raise ModelInvalid, "#{self} is invalid. Check the errors attribute" if invalid?
       end
 
-      true
+      insert_or_update
     end
 
-    def save!
-      validate
-
-      raise ModelInvalid, "#{self} is invalid. Check the errors attribute" if invalid?
-
-      save
+    def reload
+      load id
     end
 
-    def reload!(id)
+    def load(id)
       row = self.class.find id
 
-      self.class.columns.each do |column|
+      columns.each do |column|
+        self.class.attr_accessor column unless self.class.accessor?(column)
         instance_variable_set "@#{column}", row.send(column)
       end
     end
@@ -281,6 +284,28 @@ module Radical
       end
 
       result
+    end
+
+    private
+
+    def insert_or_update
+      params = save_columns.map { |c| [c, instance_variable_get("@#{c}")] }.to_h
+      query = Query.new(record: self, model: self.class)
+
+      Database.transaction do
+        if saved?
+          query
+            .where(id: id)
+            .update_all(params.merge(updated_at: Time.now.to_i))
+
+          reload
+        else
+          query.insert(@params)
+          load Database.last_insert_row_id
+        end
+      end
+
+      true
     end
   end
 end
