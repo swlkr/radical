@@ -36,6 +36,12 @@ module Radical
       tag 'input', attrs
     end
 
+    def hidden(name, attrs = {})
+      attrs.merge!(type: 'hidden', name: name, value: @model&.public_send(name))
+
+      tag 'input', attrs
+    end
+
     def number(name, attrs = {})
       attrs.merge!(type: 'number', name: name, value: @model&.public_send(name))
 
