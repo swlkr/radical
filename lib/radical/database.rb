@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'logger'
 require 'sqlite3'
 require_relative 'table'
 require_relative 'migration'
@@ -7,7 +8,7 @@ require_relative 'migration'
 module Radical
   class Database
     class << self
-      attr_writer :connection_string
+      attr_writer :connection_string, :logger
       attr_accessor :migrations_path
 
       def connection_string
@@ -23,6 +24,12 @@ module Radical
 
       def prepend_migrations_path(path)
         self.migrations_path = path
+      end
+
+      def logger
+        return if @logger.nil?
+
+        @logger || Logger.new($stdout)
       end
 
       def db
@@ -84,6 +91,35 @@ module Radical
 
       def version(filename)
         filename.split(File::SEPARATOR).last.split('_').first.to_i
+      end
+
+      def transaction(&block)
+        connection.transaction(&block)
+      end
+
+      def execute(sql, params = [])
+        # TODO: logging options? maybe log4j?
+        logger&.info "#{sql} #{params.join(',')}"
+
+        connection.execute sql, params
+      end
+
+      def get_first_value(sql, params)
+        logger&.info "#{sql} #{params.join(',')}"
+
+        connection.get_first_value sql, params
+      end
+
+      def get_first_row(sql, params)
+        logger&.info "#{sql} #{params.join(',')}"
+
+        connection.get_first_row sql, params
+      end
+
+      def last_insert_row_id
+        logger&.info 'select last_insert_row_id()'
+
+        connection.last_insert_row_id
       end
     end
   end

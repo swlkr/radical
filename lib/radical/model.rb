@@ -17,9 +17,9 @@ module Radical
     class << self
       extend T::Sig
 
-      sig { returns(SQLite3::Database) }
+      sig { returns(T.class_of(Database)) }
       def db
-        Database.connection
+        Database
       end
 
       sig { params(name: T.any(String, Symbol, T::Boolean)).void }
