@@ -31,7 +31,7 @@ module Radical
       def table_name
         return if @table_name == false
 
-        @table_name || Strings.snake_case(to_s)
+        @table_name || Strings.snake_case(to_s.split('::').last)
       end
 
       sig { returns(T::Array[String]) }
