@@ -47,19 +47,19 @@ module Radical
       end
 
       def migrate!
-        db.execute 'create table if not exists radical_migrations ( version integer primary key )'
+        execute 'create table if not exists radical_migrations ( version integer primary key )'
 
         pending_migrations.each do |file|
           puts "Executing migration #{file}"
 
           v = version(file)
 
-          migration(file).migrate!(db: db, version: v)
+          migration(file).migrate!(version: v)
         end
       end
 
       def rollback!
-        db.execute 'create table if not exists radical_migrations ( version integer primary key )'
+        execute 'create table if not exists radical_migrations ( version integer primary key )'
 
         file = applied_migrations.last
 
@@ -67,12 +67,12 @@ module Radical
 
         v = version(file)
 
-        migration(file).rollback!(db: db, version: v)
+        migration(file).rollback!(version: v)
       end
 
       def applied_versions
         sql = 'select * from radical_migrations order by version'
-        rows = db.execute sql
+        rows = execute sql
 
         rows.map { |r| r['version'] }
       end
