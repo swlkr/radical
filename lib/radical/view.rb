@@ -23,10 +23,10 @@ module Radical
       attr_accessor :_views_path, :_layout
 
       def parts(name, controller = nil)
-        p = name.split(File::SEPARATOR)
-        p.unshift(controller.class.route_name) if p.one? && controller
+        parts_ = name.split('/')
+        parts_.unshift(controller.class.route_name) if parts_.one? && controller
 
-        p
+        parts_
       end
 
       def view_path(name, controller = nil)
