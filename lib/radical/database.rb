@@ -108,13 +108,13 @@ module Radical
         connection.execute sql, params
       end
 
-      def get_first_value(sql, params)
+      def get_first_value(sql, params = [])
         logger&.info "#{sql} #{params.join(',')}"
 
         connection.get_first_value sql, params
       end
 
-      def get_first_row(sql, params)
+      def get_first_row(sql, params = [])
         logger&.info "#{sql} #{params.join(',')}"
 
         connection.get_first_row sql, params
