@@ -3,20 +3,20 @@
 require 'minitest/autorun'
 require 'radical/query'
 
-class A < Radical::Model
-end
-
 module Radical
+  class A < Model; end
+
   class TestQuery < Minitest::Test
     def setup
       Database.connection_string ||= ':memory:'
-      Database.connection.execute 'create table if not exists a ( id integer primary key )'
+      Database.logger = nil
+      Database.execute 'create table if not exists a ( id integer primary key )'
 
-      @query = Query.new :A
+      @query = Query.new model: A
     end
 
     def teardown
-      Database.connection.execute 'delete from a'
+      Database.execute 'delete from a'
     end
 
     def test_default_parts
