@@ -9,7 +9,7 @@ module Radical
   class TestQuery < Minitest::Test
     def setup
       Database.connection_string ||= ':memory:'
-      Database.logger = nil
+      Database.logger = false
       Database.execute 'create table if not exists a ( id integer primary key )'
 
       @query = Query.new model: A

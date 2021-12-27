@@ -7,10 +7,10 @@ module Radical
   class Query
     attr_accessor :params
 
-    def initialize(record: nil, model: nil)
+    def initialize(record: nil, model: nil, model_name: nil)
       @record = record
-      @model = model
-      @table_name = Strings.snake_case model.table_name
+      @model = model || Object.const_get(model_name)
+      @table_name = Strings.snake_case @model&.table_name
       @params = []
       @parts = {
         update: [],
@@ -68,6 +68,7 @@ module Radical
     end
 
     def order(string_or_hash)
+      # TODO: make sure hash values are column names
       case string_or_hash
       when Hash
         string_or_hash.each do |k, v|
@@ -94,7 +95,7 @@ module Radical
     end
 
     def to_sql
-      @parts.reject { |_, v| v.nil? || v.empty? }.map { |k, v| "#{k} #{join_if_array(v)}".strip }.join(' ')
+      @parts.reject { |_, v| v.nil? || v.empty? }.map { |k, v| "#{k} #{format_statement(k, v)}".strip }.join(' ')
     end
 
     def all
@@ -115,14 +116,16 @@ module Radical
     end
 
     def update_all(params = {})
-      @parts[:update] << ''
+      @parts[:update] << @table_name
+      @parts[:from] = []
       @parts[:select] = []
+      set_params = []
       params.each do |k, v|
-        @parts[:set] << k
-        @params << v
+        @parts[:set] << "#{k} = ?"
+        set_params << v
       end
 
-      Database.execute to_sql, @params
+      Database.execute to_sql, set_params + @params
     end
 
     def insert(params = {})
@@ -153,15 +156,38 @@ module Radical
       all.each(&block)
     end
 
+    def group_by(&block)
+      all.group_by(&block)
+    end
+
+    def find(id = nil, &block)
+      return all.find(&block) if block
+
+      where(id: id).first
+    end
+
+    def none?
+      limit(1).first.nil?
+    end
+
     private
 
     def quote(str)
       "'#{str}'"
     end
 
-    def join_if_array(could_be_array)
+    def format_statement(name, parts)
+      case name
+      when :where
+        join_if_array(parts, ' and ')
+      else
+        join_if_array(parts)
+      end
+    end
+
+    def join_if_array(could_be_array, sep = ', ')
       if could_be_array.is_a?(Array)
-        could_be_array.join(', ')
+        could_be_array.join(sep)
       else
         could_be_array
       end

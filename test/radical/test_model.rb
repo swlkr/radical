@@ -19,7 +19,7 @@ module Radical
     def setup
       Database.connection_string ||= ':memory:'
       Database.execute 'create table if not exists y ( id integer primary key, name text )'
-      Database.logger = nil
+      Database.logger = false
     end
 
     def teardown
