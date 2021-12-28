@@ -58,5 +58,24 @@ module Radical
 
       assert_equal 2, @query.count
     end
+
+    def test_where_with_string_and_array
+      actual = @query.where('id in (?) or id is null', [1, 2, 3]).to_sql
+
+      assert_equal 'select * from a where id in (?,?,?) or id is null', actual
+    end
+
+    def test_where_with_string_and_multiple_arrays
+      actual = @query.where('id in (?) or name = ? or id in (?) or id is null', [1, 2, 3], 'name', [4, 5]).to_sql
+      expected = 'select * from a where id in (?,?,?) or name = ? or id in (?,?) or id is null'
+
+      assert_equal expected, actual
+    end
+
+    def test_where_with_hash_and_array
+      actual = @query.where(id: [1, 2, 3]).to_sql
+
+      assert_equal 'select * from a where id in (?,?,?)', actual
+    end
   end
 end
