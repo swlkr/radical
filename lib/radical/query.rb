@@ -46,9 +46,13 @@ module Radical
         string_or_hash.each do |k, v|
           case v
           when Array
-            placeholders = v.map { '?' }.join(',')
-            @parts[:where] << "#{k} in (#{placeholders})"
-            @params += v
+            next if v.empty?
+
+            v1 = v.reject(&:nil?)
+            placeholders = v1.map { '?' }.join(',')
+            str = [(placeholders.empty? ? nil : "#{k} in (#{placeholders})"), (v.any?(&:nil?) ? "#{k} is null" : nil)].compact.join(' or ')
+            @parts[:where] << "(#{str})"
+            @params += v1
           when nil
             @parts[:where] << "#{k} is null"
           else
@@ -57,16 +61,7 @@ module Radical
           end
         end
       when String
-        str = string_or_hash
-
-        params.each do |p|
-          next unless p.is_a?(Array)
-
-          placeholders = p.map { '?' }.join(',')
-          str = str.sub('(?)', "(#{placeholders})")
-        end
-
-        @parts[:where] << str
+        @parts[:where] << string_or_hash
         @params += params
       end
 
