@@ -231,46 +231,52 @@ module Radical
 
     sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller))).void }
     def add_resources_paths(klass, scope: nil)
-      path_name = klass.route_name
-      scope_path_name = [scope&.route_name, klass.route_name].compact.join('_')
-      name = klass.route_name
+      route_name = klass.route_name
+      scope_path_name = [scope&.route_name, route_name].compact.join('_')
 
       if %i[index create show update destroy].any? { |method| klass.method_defined?(method) }
         if scope
-          Controller.define_method :"#{scope_path_name}_path" do |parent|
-            "/#{scope.route_name}/#{parent.id}/#{name}"
-          end
+          Controller.define_method :"#{scope_path_name}_path" do |parent, params = {}|
+            path_ = ['', scope.route_name, parent.id, route_name].compact.join('/')
+            path_ += "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
 
-          Controller.define_method :"#{path_name}_path" do |obj|
-            "/#{name}/#{obj.id}"
+            path_
           end
-        else
-          Controller.define_method :"#{path_name}_path" do |obj = nil|
-            if obj
-              "/#{name}/#{obj.id}"
-            else
-              "/#{name}"
-            end
-          end
+        end
+
+        Controller.define_method :"#{route_name}_path" do |obj = nil, params = {}|
+          path_ = ['', route_name, obj&.id].compact.join('/')
+          path_ += "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
+
+          path_
         end
       end
 
       if klass.method_defined?(:new)
         if scope
-          Controller.define_method :"new_#{scope_path_name}_path" do |parent|
-            "/#{scope.route_name}/#{parent.id}/#{name}/new"
+          Controller.define_method :"new_#{scope_path_name}_path" do |parent, params = {}|
+            path = ['', scope.route_name, parent.id, route_name, 'new'].join('/')
+            path += "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
+
+            path
           end
         else
-          Controller.define_method :"new_#{path_name}_path" do
-            "/#{name}/new"
+          Controller.define_method :"new_#{route_name}_path" do |params = {}|
+            path = ['', route_name, 'new'].join('/')
+            path += "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
+
+            path
           end
         end
       end
 
       return unless klass.method_defined?(:edit)
 
-      Controller.define_method :"edit_#{path_name}_path" do |obj|
-        "/#{name}/#{obj.id}/edit"
+      Controller.define_method :"edit_#{route_name}_path" do |obj, params = {}|
+        path = ['', route_name, obj.id, 'edit'].join('/')
+        path += "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
+
+        path
       end
     end
   end
