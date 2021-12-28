@@ -4,6 +4,8 @@ require 'minitest/autorun'
 require 'radical/model'
 
 module Radical
+  Database.logger = false
+
   class V < Model
     table false
 
@@ -19,7 +21,6 @@ module Radical
     def setup
       Database.connection_string ||= ':memory:'
       Database.execute 'create table if not exists y ( id integer primary key, name text )'
-      Database.logger = false
     end
 
     def teardown
