@@ -86,10 +86,12 @@ module Radical
         @one ||= []
         @one << model_name
 
-        name = options[:as] || Strings.snake_case(model_name.to_s)
+        one_name = Strings.snake_case(model_name.to_s)
+        name = options[:as] || one_name
+        table_name = options[:table_name] || one_name
 
         define_method :"#{name}" do
-          Query.new(model_name: model_name, record: self).where("#{table_name}.id" => send(:"#{name}_id")).first
+          instance_variable_set:"@#{name}", Query.new(model_name: model_name, record: self).where("#{table_name}.id" => send(:"#{name}_id")).first
         end
       end
 
