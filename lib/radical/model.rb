@@ -143,9 +143,12 @@ module Radical
         record
       end
 
-      def accessor?(column)
-        instance_methods.include?(column.to_sym) ||
-          instance_methods.include?(:"#{column}=")
+      def attr_writer?(column)
+        instance_methods.include?(:"#{column}=")
+      end
+
+      def attr_reader?(column)
+        instance_methods.include?(column.to_sym)
       end
 
       def validations
@@ -296,8 +299,16 @@ module Radical
     end
 
     def accessorize(column, value)
-      self.class.attr_accessor column unless self.class.accessor?(column)
-      instance_variable_set "@#{column}", value
+      self.class.attr_writer column unless self.class.attr_writer?(column)
+      self.class.attr_reader column unless self.class.attr_reader?(column)
+
+      send("#{column}=", value)
+    end
+
+    def db_params
+      columns.map do |column|
+        [column, send(column)]
+      end.to_h
     end
 
     def insert_or_update
