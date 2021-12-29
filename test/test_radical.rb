@@ -62,12 +62,12 @@ class RadicalTest < Minitest::Test
   def test_views
     get '/'
     assert last_response.ok?
-    assert_equal '<html><h1>home#index</h1></html>', last_response.body.strip
+    assert_equal '<html><h1>home#index</h1></html>', last_response.body
   end
 
   def test_view_without_layout
     get '/profile'
     assert last_response.ok?
-    assert_equal '<h1>profile#show</h1>', last_response.body.strip
+    assert_equal '<h1>profile#show</h1>', last_response.body
   end
 end
