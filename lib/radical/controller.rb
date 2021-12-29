@@ -19,7 +19,7 @@ module Radical
     class << self
       extend T::Sig
 
-      attr_accessor :skip_csrf_actions
+      attr_accessor :skip_csrf_actions, :_layout
 
       sig { params(path: String).void }
       def prepend_view_path(path)
@@ -27,7 +27,7 @@ module Radical
       end
 
       def layout(name)
-        View.layout name
+        @_layout = name
       end
 
       sig { returns(String) }
@@ -102,7 +102,7 @@ module Radical
 
     sig { params(name: T.any(String, Symbol), locals: T.nilable(Hash)).returns(String) }
     def view(name, locals = {})
-      View.render(name, self, { locals: locals })
+      View.render(name, self, { locals: locals, layout: self.class._layout })
     end
 
     sig { params(name: T.any(String, Symbol), locals: T.nilable(Hash)).returns(String) }

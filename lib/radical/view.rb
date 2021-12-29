@@ -20,10 +20,10 @@ module Radical
 
   class View
     class << self
-      attr_accessor :_views_path, :_layout
+      attr_accessor :_views_path
 
       def parts(name, controller = nil)
-        parts_ = name.split('/')
+        parts_ = name.to_s.split('/')
         parts_.unshift(controller.class.route_name) if parts_.one? && controller
 
         parts_
@@ -43,10 +43,6 @@ module Radical
         @_views_path = path
       end
 
-      def layout(name)
-        @_layout = name
-      end
-
       def partial(name, scope, options = {})
         parts = parts(name, scope)
         parts[parts.size - 1] = "_#{parts.last}"
@@ -61,16 +57,16 @@ module Radical
 
         t = template(filename)
 
-        layout_path = view_path(options[:layout] || @_layout || 'layout')
+        layout_path = view_path(options[:layout] || 'layout')
 
         layout = template(layout_path) if options[:layout] != false && File.exist?(layout_path)
 
         if layout
           layout.render scope, {} do
-            t.render scope, options[:locals] || {}
-          end
+            t.render(scope, options[:locals] || {}).strip
+          end.strip
         else
-          t.render scope, options[:locals] || {}
+          t.render(scope, options[:locals] || {}).strip
         end
       end
     end
