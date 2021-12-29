@@ -121,6 +121,13 @@ module Radical
       @model.new row if row
     end
 
+    def last
+      rows = Database.execute to_sql, @params
+      last_row = rows.last
+
+      @model.new last_row if last_row
+    end
+
     def delete_all
       @parts[:delete] << ''
       @parts[:select] = []
