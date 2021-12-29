@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
+- **Breaking** Change path helpers from `x_path` to `index_x_path` or `create_x_path` (they match the controller actions)
 - Reload model after inserting/updating
 - Somehow don't break anything but change models, controllers and views to generate with singular anyway
 - Change convention to assume nothing about the plurality or case of controllers/models
@@ -18,6 +19,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Make many/one actually work
 - Bring in shopify/tapioca gem
 - Ignore modules in `Model#table_name`
+- Add a bunch of convenience methods to the models/queries
+- Terminate queries in a few methods, `all`, `group_by`, `each`, `first`, `last`
+- Actually get layout working
 
 # 1.2.0 (2021-12-17)
 
