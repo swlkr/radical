@@ -27,7 +27,7 @@ module Radical
       @controller = controller
       @override_method = options[:method]&.upcase || (@model&.saved? ? 'PATCH' : 'POST')
       @method = %w[GET POST].include?(@override_method) ? @override_method : 'POST'
-      @action = options[:action] || action_from(model: @model, controller: controller)
+      @action = options[:action] || options[:url] || action_from(model: @model, controller: controller)
     end
 
     def text(name, attrs = {})
