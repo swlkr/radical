@@ -100,14 +100,15 @@ module Radical
       @request.params
     end
 
-    sig { params(name: T.any(String, Symbol), locals: T.nilable(Hash)).returns(String) }
-    def view(name, locals = {})
-      View.render(name, self, { locals: locals, layout: self.class._layout })
+    sig { params(name: T.any(String, Symbol), options: Hash).returns(Rack::Response) }
+    def view(name, options = {})
+      body = View.render(name, self, { layout: self.class._layout }.merge(options))
+      Rack::Response.new(body, 200, { 'Content-Type' => 'text/html' })
     end
 
-    sig { params(name: T.any(String, Symbol), locals: T.nilable(Hash)).returns(String) }
+    sig { params(name: T.any(String, Symbol), locals: Hash).returns(String) }
     def partial(name, locals = {})
-      View.partial(name, self, { locals: locals, layout: false })
+      View.partial(name, self, { locals: locals })
     end
 
     sig { params(options: Hash, block: T.proc.void).returns(String) }

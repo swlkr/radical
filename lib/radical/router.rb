@@ -118,6 +118,8 @@ module Radical
         params = request.path_info.match(r.first)&.named_captures
       end
 
+      # TODO: render public/404.html?
+      # TODO: raise 404 error?
       return Rack::Response.new('404 Not Found', 404) unless route
 
       klass, method = route.last
@@ -130,13 +132,11 @@ module Radical
 
       response = instance.public_send(method)
 
-      return response if response.is_a?(Rack::Response)
-
-      body = instance.view(method.to_s)
-
-      return Rack::Response.new(nil, 404) if body.nil?
-
-      Rack::Response.new(body, 200, { 'Content-Type' => 'text/html' })
+      if response.is_a?(Rack::Response)
+        response
+      else
+        instance.view(method.to_s)
+      end
     end
 
     private
