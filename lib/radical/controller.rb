@@ -123,12 +123,25 @@ module Radical
       end
     end
 
-    sig { params(to: T.any(Symbol, String), options: Hash).returns(Rack::Response) }
-    def redirect(to, options = {})
-      to = self.class.action_to_url(to) if to.is_a?(Symbol)
-      options.each { |k, v| flash[k] = v }
+    def redirect_location(val)
+      case val
+      when Model
+        send("show_#{val.table_name}_path", val)
+      when Symbol
+        send("#{val}_#{self.class.route_name}_path", val)
+      when String
+        val
+      else
+        ''
+      end
+    end
 
-      Rack::Response.new(nil, 302, { 'Location' => to })
+    sig { params(to: T.any(Model, Symbol, String), options: Hash).returns(Rack::Response) }
+    def redirect(to, options = {})
+      options.each { |k, v| flash[k] = v }
+      location = redirect_location to
+
+      Rack::Response.new(nil, 302, { 'Location' => location })
     end
 
     def flash
