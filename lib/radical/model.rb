@@ -50,9 +50,9 @@ module Radical
         model
       end
 
-      sig { params(id: T.any(String, Integer)).returns(Model) }
+      sig { params(id: T.nilable(T.any(String, Integer))).returns(T.nilable(Model)) }
       def find(id)
-        Query.new(model: self).where(id: id.to_i).limit(1).first
+        Query.new(model: self).where(id: id&.to_i).limit(1).first
       end
 
       sig { returns(T::Array[Model]) }
