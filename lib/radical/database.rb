@@ -98,15 +98,13 @@ module Radical
       end
 
       def transaction(&block)
-        logger&.info 'Database transaction started'
-
         if connection.transaction_active?
           yield
         else
+          logger&.info 'Database transaction started'
           connection.transaction(&block)
+          logger&.info 'Database transaction end'
         end
-
-        logger&.info 'Database transaction end'
       end
 
       def execute(sql, params = [])
