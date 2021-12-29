@@ -70,6 +70,11 @@ module Radical
         Query.new(model: self).order('id').limit(1).first
       end
 
+      sig { returns(Model) }
+      def last
+        Query.new(model: self).order('id desc').limit(1).first
+      end
+
       def many(model_name, options = {})
         @many ||= []
         @many << model_name
