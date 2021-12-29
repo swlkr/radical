@@ -2,6 +2,5 @@
 
 require 'radical'
 
-class TestModel < Radical::Model
-  table false
+class ModelTest < Radical::Model
 end

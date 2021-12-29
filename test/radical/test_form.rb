@@ -2,14 +2,14 @@
 
 require 'minitest/autorun'
 require 'radical'
-require 'models/test_model'
+require 'models/model_test'
 
 module Radical
   class TestFormsController < Controller
     def create; end
   end
 
-  class TestFormModel < TestModel
+  class TestFormModel < ModelTest
   end
 
   class TestForm < Minitest::Test

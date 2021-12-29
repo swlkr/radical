@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'test_model'
+require_relative 'model_test'
 
-class A < TestModel
+class A < ModelTest
+  table false
 end
