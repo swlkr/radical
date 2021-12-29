@@ -28,7 +28,7 @@ require 'sorbet-runtime'
 #
 # class UsersController < Controller
 #   def show
-#     render plain: "users#show(#{params['id']})"
+#     plain "users#show(#{params['id']})"
 #   end
 # end
 module Radical
@@ -56,6 +56,8 @@ module Radical
       [:destroy, 'DELETE', '']
     ].freeze
 
+    SUFFIX_ACTIONS = %i[edit new].freeze
+
     attr_accessor :routes
 
     sig { void }
@@ -63,21 +65,34 @@ module Radical
       @routes = Hash.new { |hash, key| hash[key] = [] }
     end
 
-    sig { params(classes: T::Array[T.class_of(Controller)]).returns(String) }
-    def route_prefix(classes)
-      classes.map(&:route_name).map { |n| "#{n}/:#{n}_id" }.join('/')
+    sig { params(klass: T.class_of(Controller), parents: T.nilable(T::Array[T.class_of(Controller)])).void }
+    def add_root(klass, parents: nil)
+      if parents
+        parents.each do |scope|
+          add_routes(klass, name: '', actions: ACTIONS, scope: scope)
+          add_root_paths(klass, scope: scope)
+          add_root_paths(klass, scope: scope, url: true)
+        end
+      else
+        add_routes(klass, name: '', actions: ACTIONS)
+        add_root_paths(klass)
+        add_root_paths(klass, url: true)
+      end
     end
 
-    sig { params(klass: T.class_of(Controller)).void }
-    def add_root(klass)
-      add_routes(klass, name: '', actions: ACTIONS)
-      add_root_paths(klass)
-    end
-
-    sig { params(klass: T.class_of(Controller)).void }
-    def add_resource(klass)
-      add_routes(klass, actions: RESOURCE_ACTIONS)
-      add_resource_paths(klass)
+    sig { params(klass: T.class_of(Controller), parents: T.nilable(T::Array[T.class_of(Controller)])).void }
+    def add_resource(klass, parents: nil)
+      if parents
+        parents.each do |scope|
+          add_routes(klass, actions: RESOURCE_ACTIONS, scope: scope)
+          add_resource_paths(klass, scope: scope)
+          add_resource_paths(klass, scope: scope, url: true)
+        end
+      else
+        add_routes(klass, actions: RESOURCE_ACTIONS)
+        add_resource_paths(klass)
+        add_resource_paths(klass, url: true)
+      end
     end
 
     sig { params(klass: T.class_of(Controller), parents: T.nilable(T::Array[T.class_of(Controller)])).void }
@@ -86,12 +101,12 @@ module Radical
         parents.each do |scope|
           add_routes(klass, actions: ACTIONS, scope: scope)
           add_resources_paths(klass, scope: scope)
-          add_resources_urls(klass, scope: scope)
+          add_resources_paths(klass, scope: scope, url: true)
         end
       else
         add_routes(klass, actions: ACTIONS)
         add_resources_paths(klass)
-        add_resources_urls(klass)
+        add_resources_paths(klass, url: true)
       end
     end
 
@@ -149,134 +164,62 @@ module Radical
       end
     end
 
-    sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller))).void }
-    def add_resources_urls(klass, scope: nil)
-      route_name = klass.route_name
-      scope_name = [scope&.route_name, klass.route_name].compact.join('_')
+    sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller)), url: T::Boolean).void }
+    def add_root_paths(klass, scope: nil, url: false)
+      ACTIONS.each do |action, _, _|
+        method = :"#{[action, scope&.route_name, klass.route_name, url ? 'url' : 'path'].compact.join('_')}"
 
-      if %i[index create show update destroy].any? { |method| klass.method_defined?(method) }
-        if scope
-          Controller.define_method :"#{scope_name}_url" do |parent = nil|
-            [url_prefix, scope.route_name, parent&.id, route_name].join('/')
-          end
+        next if !klass.method_defined?(action) || Controller.method_defined?(method)
+
+        Controller.define_method method do |model = nil, params = {}|
+          route_path(
+            action: action,
+            route_name: '',
+            model: model,
+            params: params,
+            scope: scope,
+            prefix: url ? url_prefix : ''
+          )
         end
-
-        Controller.define_method :"#{route_name}_url" do |obj = nil|
-          [url_prefix, route_name, obj&.id].compact.join('/')
-        end
-      end
-
-      if klass.method_defined?(:new)
-        Controller.define_method :"new_#{scope_name || route_name}_url" do |parent = nil|
-          [url_prefix, scope&.route_name, parent&.id, route_name, 'new'].compact.join('/')
-        end
-      end
-
-      return unless klass.method_defined?(:edit)
-
-      Controller.define_method :"edit_#{route_name}_url" do |obj|
-        [url_prefix, route_name, obj.id, 'edit'].join('/')
       end
     end
 
-    sig { params(klass: T.class_of(Controller)).void }
-    def add_root_paths(klass)
-      route_name = klass.route_name
+    sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller)), url: T::Boolean).void }
+    def add_resource_paths(klass, scope: nil, url: false)
+      RESOURCE_ACTIONS.each do |action, _, _|
+        method = :"#{[action, scope&.route_name, klass.route_name, url ? 'url' : 'path'].compact.join('_')}"
 
-      if %i[index create show update destroy].any? { |method| klass.method_defined?(method) }
-        Controller.define_method :"#{route_name}_path" do |obj = nil|
-          if obj
-            "/#{obj.id}"
-          else
-            '/'
-          end
+        next if !klass.method_defined?(action) || Controller.method_defined?(method)
+
+        Controller.define_method method do |params = {}|
+          route_path(
+            action: action,
+            route_name: klass.route_name,
+            scope: scope,
+            params: params,
+            prefix: url ? url_prefix : ''
+          )
         end
-      end
-
-      if klass.method_defined?(:new)
-        Controller.define_method :"new_#{route_name}_path" do
-          '/new'
-        end
-      end
-
-      return unless klass.method_defined?(:edit)
-
-      Controller.define_method :"edit_#{route_name}_path" do |obj|
-        "/#{obj.id}/edit"
       end
     end
 
-    sig { params(klass: T.class_of(Controller)).void }
-    def add_resource_paths(klass)
-      name = klass.route_name
+    sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller)), url: T::Boolean).void }
+    def add_resources_paths(klass, scope: nil, url: false)
+      ACTIONS.each do |action, _, _|
+        method = :"#{[action, scope&.route_name, klass.route_name, url ? 'url' : 'path'].compact.join('_')}"
 
-      if %i[create show update destroy].any? { |method| klass.method_defined?(method) }
-        Controller.define_method :"#{name}_path" do
-          "/#{name}"
+        next if !klass.method_defined?(action) || Controller.method_defined?(method)
+
+        Controller.define_method method do |model = nil, params = {}|
+          route_path(
+            action: action,
+            model: model,
+            route_name: klass.route_name,
+            scope: scope,
+            params: params,
+            prefix: url ? url_prefix : ''
+          )
         end
-      end
-
-      if klass.method_defined?(:new)
-        Controller.define_method :"new_#{name}_path" do
-          "/#{name}/new"
-        end
-      end
-
-      return unless klass.method_defined?(:edit)
-
-      Controller.define_method :"edit_#{name}_path" do
-        "/#{name}/edit"
-      end
-    end
-
-    sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller))).void }
-    def add_resources_paths(klass, scope: nil)
-      route_name = klass.route_name
-      scope_path_name = [scope&.route_name, route_name].compact.join('_')
-
-      if %i[index create show update destroy].any? { |method| klass.method_defined?(method) }
-        if scope
-          Controller.define_method :"#{scope_path_name}_path" do |parent, params = {}|
-            path_ = ['', scope.route_name, parent.id, route_name].compact.join('/')
-            path_ += "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
-
-            path_
-          end
-        end
-
-        Controller.define_method :"#{route_name}_path" do |obj = nil, params = {}|
-          path_ = ['', route_name, obj&.id].compact.join('/')
-          path_ += "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
-
-          path_
-        end
-      end
-
-      if klass.method_defined?(:new)
-        if scope
-          Controller.define_method :"new_#{scope_path_name}_path" do |parent, params = {}|
-            path = ['', scope.route_name, parent.id, route_name, 'new'].join('/')
-            path += "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
-
-            path
-          end
-        else
-          Controller.define_method :"new_#{route_name}_path" do |params = {}|
-            path = ['', route_name, 'new'].join('/')
-            path += "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
-
-            path
-          end
-        end
-      end
-
-      return unless klass.method_defined?(:edit)
-
-      Controller.define_method :"edit_#{route_name}_path" do |obj, params = {}|
-        path = ['', route_name, obj.id, 'edit'].join('/')
-        path += "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
-
-        path
       end
     end
   end

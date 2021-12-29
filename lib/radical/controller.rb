@@ -168,6 +168,19 @@ module Radical
       "#{@request.scheme}://#{@request.host}#{port}"
     end
 
+    def route_path(action:, route_name:, model: nil, scope: nil, params: {}, prefix: '')
+      query_string = "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
+      suffix = action if Router::SUFFIX_ACTIONS.include?(action)
+
+      path = if scope
+               [prefix, scope.route_name, model&.id, route_name, suffix].compact.join('/')
+             else
+               [prefix, route_name, model&.id, suffix].compact.join('/')
+             end
+
+      [path, query_string].compact.join('')
+    end
+
     private
 
     def compiled_assets_path(assets, type)
