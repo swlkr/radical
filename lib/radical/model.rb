@@ -313,17 +313,19 @@ module Radical
 
     def insert_or_update
       query = Query.new(record: self, model: self.class)
+      exceptions = %w[id updated_at created_at]
+      params = db_params.except(*exceptions)
 
       Database.transaction do
         if saved?
           query
             .where(id: id)
             .limit(1)
-            .update_all @params.except('id', 'created_at').merge('updated_at' => Time.now.to_i)
+            .update_all params.merge('updated_at' => Time.now.to_i)
 
           reload
         else
-          query.insert(@params)
+          query.insert params
           load Database.last_insert_row_id
         end
       end
