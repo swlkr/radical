@@ -109,6 +109,9 @@ module Radical
           @fk_changes ||= {}
           @fk_changes[fk_column] = true
 
+          # coerce to nil
+          id = nil if id.nil? || id&.to_s&.empty?
+
           instance_variable_set fk_column_iv, id
           instance_variable_set iv, id if id.nil?
         end
