@@ -104,9 +104,9 @@ module Radical
       path_name = model.class.table_name
 
       if model.saved?
-        controller.send(:"#{path_name}_path", model)
+        controller.send(:"update_#{path_name}_path", model)
       else
-        controller.send(:"#{path_name}_path")
+        controller.send(:"create_#{path_name}_path", model)
       end
     end
   end
