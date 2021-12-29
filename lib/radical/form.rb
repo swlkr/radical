@@ -87,11 +87,11 @@ module Radical
 
     def tag(name, attrs, &block)
       attr_string = attrs.empty? ? '' : " #{html_attributes(attrs)}"
-      open_tag = "<#{name}"
+      open_tag_str = "<#{name}"
       self_closing = SELF_CLOSING_TAGS.include?(name)
       end_tag = self_closing ? ' />' : "</#{name}>"
 
-      "#{open_tag}#{attr_string}#{self_closing ? '' : '>'}#{block&.call}#{end_tag}"
+      "#{open_tag_str}#{attr_string}#{self_closing ? '' : '>'}#{block&.call}#{end_tag}"
     end
 
     def html_attributes(options = {})
