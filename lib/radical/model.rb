@@ -94,9 +94,38 @@ module Radical
         one_name = Strings.snake_case(model_name.to_s)
         name = options[:as] || one_name
         table_name = options[:table_name] || one_name
+        iv = "@#{name}"
+        fk_column = "#{name}_id"
+        fk_column_iv = "@#{name}_id"
+
+        attr_reader fk_column
+
+        define_method :"#{name}=" do |record|
+          instance_variable_set iv, record
+          instance_variable_set fk_column_iv, record&.id
+        end
+
+        define_method :"#{fk_column}=" do |id|
+          @fk_changes ||= {}
+          @fk_changes[fk_column] = true
+
+          instance_variable_set fk_column_iv, id
+          instance_variable_set iv, id if id.nil?
+        end
 
         define_method :"#{name}" do
-          instance_variable_set:"@#{name}", Query.new(model_name: model_name, record: self).where("#{table_name}.id" => send(:"#{name}_id")).first
+          @fk_changes ||= {}
+
+          fk = send(fk_column)
+
+          return unless fk
+
+          if @fk_changes[fk_column] || !@fk_changes.key?(fk_column)
+            @fk_changes[fk_column] = false
+            instance_variable_set(iv, Query.new(model_name: model_name, record: self).where("#{table_name}.id" => send(fk_column)).first)
+          else
+            instance_variable_get(iv)
+          end
         end
       end
 
