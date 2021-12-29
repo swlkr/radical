@@ -176,7 +176,11 @@ module Radical
     def initialize(params = {})
       @errors = {}
 
-      load_params params
+      table_params = {}
+      table_params = columns.map { |c| [c, params[c]] }.to_h if self.class.table_name
+      params = table_params.merge(params)
+
+      load_attributes params
     end
 
     def columns
@@ -200,7 +204,7 @@ module Radical
     end
 
     def update(params)
-      load_params(params)
+      load_attributes params
       save
     end
 
@@ -279,18 +283,12 @@ module Radical
 
     private
 
-    def load_params(params)
-      @params = params.transform_keys(&:to_s).map do |column, value|
-        if value.is_a?(Model)
-          column = "#{column}_id"
-          value = value.id
-        end
+    def load_attributes(params)
+      @params = params
+      @params.transform_keys!(&:to_s)
 
-        [column, value]
-      end.to_h
-
-      @params.each do |column, value|
-        accessorize(column, value)
+      @params.each do |k, v|
+        accessorize k, v
       end
     end
 
