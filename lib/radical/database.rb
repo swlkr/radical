@@ -16,7 +16,13 @@ module Radical
       end
 
       def connection
-        @connection ||= SQLite3::Database.new(connection_string, { results_as_hash: true })
+        return @connection if @connection
+
+        @connection = SQLite3::Database.new(connection_string, { results_as_hash: true })
+        @connection.execute 'PRAGMA journal_model = WAL'
+        @connection.execute 'PRAGMA foreign_keys = 1'
+
+        @connection
       end
 
       def prepend_migrations_path(path)
