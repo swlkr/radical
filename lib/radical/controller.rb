@@ -128,7 +128,7 @@ module Radical
       when Model
         send("show_#{val.table_name}_path", val)
       when Symbol
-        send("#{val}_#{self.class.route_name}_path", val)
+        send("#{val}_#{self.class.route_name}_path")
       when String
         val
       else
