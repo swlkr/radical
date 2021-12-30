@@ -167,6 +167,10 @@ module Radical
       def find_by(params)
         Query.new(model: self).where(params).first
       end
+
+      def inspect
+        columns.join("\n")
+      end
     end
 
     attr_accessor :errors, :id
@@ -278,6 +282,12 @@ module Radical
       end
 
       result
+    end
+
+    def inspect
+      attr_str = to_h.map { |k, v| "  #{k} => #{v}" }.join("\n")
+
+      "#{self} {\n#{attr_str}\n}"
     end
 
     private
