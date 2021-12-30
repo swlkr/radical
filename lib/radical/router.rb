@@ -167,7 +167,8 @@ module Radical
     sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller)), url: T::Boolean).void }
     def add_root_paths(klass, scope: nil, url: false)
       ACTIONS.each do |action, _, _|
-        method = :"#{[action, scope&.route_name, klass.route_name, url ? 'url' : 'path'].compact.join('_')}"
+        scope_name = scope&.route_name unless %i[show edit update destroy].include?(action)
+        method = :"#{[action, scope_name, klass.route_name, url ? 'url' : 'path'].compact.join('_')}"
 
         next if !klass.method_defined?(action) || Controller.method_defined?(method)
 
@@ -177,8 +178,8 @@ module Radical
             route_name: '',
             model: model,
             params: params,
-            scope: scope,
-            prefix: url ? url_prefix : ''
+            scope_name: scope_name,
+            url: url
           )
         end
       end
@@ -187,7 +188,8 @@ module Radical
     sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller)), url: T::Boolean).void }
     def add_resource_paths(klass, scope: nil, url: false)
       RESOURCE_ACTIONS.each do |action, _, _|
-        method = :"#{[action, scope&.route_name, klass.route_name, url ? 'url' : 'path'].compact.join('_')}"
+        scope_name = scope&.route_name unless %i[show edit update destroy].include?(action)
+        method = :"#{[action, scope_name, klass.route_name, url ? 'url' : 'path'].compact.join('_')}"
 
         next if !klass.method_defined?(action) || Controller.method_defined?(method)
 
@@ -195,9 +197,9 @@ module Radical
           route_path(
             action: action,
             route_name: klass.route_name,
-            scope: scope,
+            scope_name: scope_name,
             params: params,
-            prefix: url ? url_prefix : ''
+            url: url
           )
         end
       end
@@ -206,7 +208,8 @@ module Radical
     sig { params(klass: T.class_of(Controller), scope: T.nilable(T.class_of(Controller)), url: T::Boolean).void }
     def add_resources_paths(klass, scope: nil, url: false)
       ACTIONS.each do |action, _, _|
-        method = :"#{[action, scope&.route_name, klass.route_name, url ? 'url' : 'path'].compact.join('_')}"
+        scope_name = scope&.route_name unless %i[show edit update destroy].include?(action)
+        method = :"#{[action, scope_name, klass.route_name, url ? 'url' : 'path'].compact.join('_')}"
 
         next if !klass.method_defined?(action) || Controller.method_defined?(method)
 
@@ -215,9 +218,9 @@ module Radical
             action: action,
             model: model,
             route_name: klass.route_name,
-            scope: scope,
+            scope_name: scope_name,
             params: params,
-            prefix: url ? url_prefix : ''
+            url: url
           )
         end
       end

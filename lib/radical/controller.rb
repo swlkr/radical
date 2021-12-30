@@ -124,19 +124,6 @@ module Radical
       end
     end
 
-    def redirect_location(val)
-      case val
-      when Model
-        send("show_#{val.table_name}_path", val)
-      when Symbol
-        send("#{val}_#{self.class.route_name}_path")
-      when String
-        val
-      else
-        ''
-      end
-    end
-
     sig { params(to: T.any(Model, Symbol, String), options: Hash).returns(Rack::Response) }
     def redirect(to, options = {})
       options.each { |k, v| flash[k] = v }
@@ -163,18 +150,13 @@ module Radical
       end
     end
 
-    def url_prefix
-      port = @request.port == 80 || @request.port == 443 ? '' : ":#{@request.port}"
-
-      "#{@request.scheme}://#{@request.host}#{port}"
-    end
-
-    def route_path(action:, route_name:, model: nil, scope: nil, params: {}, prefix: '')
-      query_string = "?#{Rack::Utils.build_nested_query(params)}" unless params.empty?
+    def route_path(action:, route_name:, model: nil, scope_name: nil, params: {}, url: false)
+      query_string = "?#{Rack::Utils.build_nested_query(params)}" unless params&.empty?
       suffix = action if Router::SUFFIX_ACTIONS.include?(action)
+      prefix = url ? url_prefix : ''
 
-      path = if scope
-               [prefix, scope.route_name, model&.id, route_name, suffix].compact.join('/')
+      path = if scope_name
+               [prefix, scope_name, model&.id, route_name, suffix].compact.join('/')
              else
                [prefix, route_name, model&.id, suffix].compact.join('/')
              end
@@ -183,6 +165,25 @@ module Radical
     end
 
     private
+
+    def url_prefix
+      port = @request.port == 80 || @request.port == 443 ? '' : ":#{@request.port}"
+
+      "#{@request.scheme}://#{@request.host}#{port}"
+    end
+
+    def redirect_location(val)
+      case val
+      when Model
+        send("show_#{val.table_name}_path", val)
+      when Symbol
+        send("#{val}_#{self.class.route_name}_path")
+      when String
+        val
+      else
+        ''
+      end
+    end
 
     def compiled_assets_path(assets, type)
       if type == :css
