@@ -198,10 +198,14 @@ module Radical
       self.class.table_name
     end
 
-    def delete
-      sql = "delete from #{table_name} where id = ? limit 1"
+    def destroy
+      delete
+    end
 
-      db.execute sql, id
+    def delete
+      sql = "delete from #{table_name} where id = ?"
+
+      Database.execute sql, id
 
       self
     end
