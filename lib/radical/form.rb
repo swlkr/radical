@@ -23,6 +23,7 @@ module Radical
     ].freeze
 
     def initialize(options, controller)
+      @options = options
       @model = options[:model]
       @controller = controller
       @override_method = options[:method]&.upcase || (@model&.saved? ? 'PATCH' : 'POST')
@@ -66,7 +67,7 @@ module Radical
     end
 
     def open_tag
-      "<form #{html_attributes(action: @action, method: @method)}>"
+      "<form #{html_attributes(@options.slice(:class, :style).merge(action: @action, method: @method))}>"
     end
 
     def csrf_tag
