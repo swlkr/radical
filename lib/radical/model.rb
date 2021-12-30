@@ -29,9 +29,9 @@ module Radical
         @table_name || Strings.snake_case(to_s.split('::').last)
       end
 
-      sig { returns(T::Array[String]) }
+      sig { returns(T.nilable(T::Hash[String, T::Hash[String, String]])) }
       def columns
-        @columns ||= Database.columns table_name
+        Database.columns table_name if table_name
       end
 
       sig { params(id: T.any(String, Integer)).returns(Model) }
@@ -169,7 +169,9 @@ module Radical
       end
 
       def inspect
-        columns.join("\n")
+        attr_str = columns&.map { |k, v| "  #{k} => #{v}" }&.join("\n")
+
+        "#{self} {\n#{attr_str}\n}"
       end
     end
 
@@ -180,7 +182,7 @@ module Radical
       @errors = {}
 
       table_params = {}
-      table_params = columns.map { |c| [c, params[c]] }.to_h if self.class.table_name
+      table_params = columns&.keys&.map { |c| [c, params[c]] }&.to_h if columns
       params = table_params.merge(params)
 
       load_attributes params
@@ -188,10 +190,6 @@ module Radical
 
     def columns
       self.class.columns
-    end
-
-    def db
-      self.class.db
     end
 
     def table_name
@@ -269,7 +267,7 @@ module Radical
     def load(id)
       row = self.class.find id
 
-      columns.each do |column|
+      columns&.each_key do |column|
         accessorize(column, row.send(column))
       end
     end
@@ -281,7 +279,7 @@ module Radical
     def to_h
       result = {}
 
-      columns.each do |column|
+      columns&.each_key do |column|
         result[column] = instance_variable_get "@#{column}"
       end
 
@@ -313,7 +311,7 @@ module Radical
     end
 
     def db_params
-      columns.map do |column|
+      columns&.keys&.map do |column|
         [column, send(column)]
       end.to_h
     end

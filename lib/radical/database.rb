@@ -133,14 +133,18 @@ module Radical
 
         sql = 'select sqlite_master.name as t, tables.name, tables.type from sqlite_master join pragma_table_info(sqlite_master.name) as tables'
 
-        puts rows = execute(sql)
-
-        @columns = rows.group_by { |r| r['t'] }.transform_values { |v| v.map { |v1| v1['name'] } }
+        @columns ||= execute(sql)
+                     .group_by { |r| r['t'] }
+                     .transform_values do |v|
+                       v.map { |v1| [v1['name'], v1['type']] }.to_h
+                     end
       end
     end
   end
 
-  Database.execute 'PRAGMA journal_model = WAL'
-  Database.execute 'PRAGMA foreign_keys = ON'
-  Database.columns
+  if Database.connection_string && Database.connection
+    Database.execute 'PRAGMA journal_model = WAL'
+    Database.execute 'PRAGMA foreign_keys = ON'
+    Database.columns
+  end
 end
