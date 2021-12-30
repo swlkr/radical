@@ -59,11 +59,12 @@ module Radical
 
     def references(model_sym, options = {})
       table_name = Strings.snake_case model_sym.to_s
+      column_name = options[:column] || "#{table_name}_id"
 
-      integer("#{table_name}_id", options)
+      integer(column_name, options.except(:on_delete, :on_update))
 
       @foreign_keys << [
-        "foreign key(#{table_name}_id) references #{table_name}(id)",
+        "foreign key(#{column_name}) references #{table_name}(id)",
         column_options(options.slice(:on_delete, :on_update))
       ].compact.join(' ').strip
     end
