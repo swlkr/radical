@@ -16,13 +16,7 @@ module Radical
       end
 
       def connection
-        return @connection if @connection
-
-        @connection = SQLite3::Database.new(connection_string, { results_as_hash: true })
-        @connection.execute 'PRAGMA journal_model = WAL'
-        @connection.execute 'PRAGMA foreign_keys = 1'
-
-        @connection
+        @connection ||= SQLite3::Database.new(connection_string, { results_as_hash: true })
       end
 
       def prepend_migrations_path(path)
@@ -36,10 +30,6 @@ module Radical
         default_logger.progname = 'db'
 
         @logger || default_logger
-      end
-
-      def db
-        connection
       end
 
       def migration(file)
@@ -137,6 +127,20 @@ module Radical
 
         connection.last_insert_row_id
       end
+
+      def columns(table_name = nil)
+        return @columns[table_name] if @columns
+
+        sql = 'select sqlite_master.name as t, tables.name, tables.type from sqlite_master join pragma_table_info(sqlite_master.name) as tables'
+
+        puts rows = execute(sql)
+
+        @columns = rows.group_by { |r| r['t'] }.transform_values { |v| v.map { |v1| v1['name'] } }
+      end
     end
   end
+
+  Database.execute 'PRAGMA journal_model = WAL'
+  Database.execute 'PRAGMA foreign_keys = ON'
+  Database.columns
 end

@@ -17,11 +17,6 @@ module Radical
     class << self
       extend T::Sig
 
-      sig { returns(T.class_of(Database)) }
-      def db
-        Database
-      end
-
       sig { params(name: T.any(String, Symbol, T::Boolean)).void }
       def table(name)
         @table_name = name
@@ -36,9 +31,7 @@ module Radical
 
       sig { returns(T::Array[String]) }
       def columns
-        sql = "select name from pragma_table_info('#{table_name}');"
-
-        @columns ||= db.execute(sql).map { |r| r['name'] }
+        @columns ||= Database.columns table_name
       end
 
       sig { params(id: T.any(String, Integer)).returns(Model) }
