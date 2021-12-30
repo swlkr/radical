@@ -327,7 +327,6 @@ module Radical
         if saved?
           query
             .where(id: id)
-            .limit(1)
             .update_all params.merge('updated_at' => Time.now.to_i)
 
           reload
