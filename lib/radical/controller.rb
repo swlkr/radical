@@ -9,6 +9,7 @@ require_relative 'view'
 require_relative 'env'
 require_relative 'form'
 require_relative 'strings'
+require_relative 'tag'
 
 module Radical
   class Controller
@@ -79,7 +80,7 @@ module Radical
 
     attr_reader :options
 
-    sig { params(request: Rack::Request, options: T.nilable(Hash)).void }
+    sig { params(request: Rack::Request, options: Hash).void }
     def initialize(request, options: {})
       @request = request
       @options = options
@@ -140,13 +141,13 @@ module Radical
       @request.env['rack.session']
     end
 
-    def assets_path(type)
-      assets = options[:assets]
+    def assets_path(type, attrs = {})
+      assets = @options[:assets]
 
       if Env.production?
-        compiled_assets_path(assets, type)
+        compiled_assets_path(assets, type, attrs)
       else
-        not_compiled_assets_path(assets, type)
+        not_compiled_assets_path(assets, type, attrs)
       end
     end
 
@@ -185,22 +186,22 @@ module Radical
       end
     end
 
-    def compiled_assets_path(assets, type)
+    def compiled_assets_path(assets, type, attrs)
       if type == :css
-        link_tag(assets.compiled[:css])
+        link_tag(assets.compiled[:css], attrs)
       else
-        script_tag(assets.compiled[:js])
+        script_tag(assets.compiled[:js], attrs)
       end
     end
 
-    def not_compiled_assets_path(assets, type)
+    def not_compiled_assets_path(assets, type, attrs)
       if type == :css
         assets.assets[:css].map do |asset|
-          link_tag("/assets/#{type}/#{asset}")
+          link_tag("/assets/#{type}/#{asset}", attrs)
         end.join("\n")
       else
         assets.assets[:js].map do |asset|
-          script_tag("/assets/#{type}/#{asset}")
+          script_tag("/assets/#{type}/#{asset}", attrs)
         end.join("\n")
       end
     end
@@ -216,12 +217,18 @@ module Radical
       @output
     end
 
-    def script_tag(src)
-      "<script type=\"application/javascript\" src=\"#{src}\"></script>"
+    def script_tag(src, attrs)
+      defaults = { 'type' => 'application/javascript', 'src' => src }
+      attrs.merge!(defaults)
+
+      Tag.string('script', attrs)
     end
 
-    def link_tag(href)
-      "<link rel=\"stylesheet\" type=\"text/css\" href=\"#{href}\" />"
+    def link_tag(href, attrs)
+      defaults = { 'type' => 'text/css', 'rel' => 'stylesheet', 'href' => href }
+      attrs.merge!(defaults)
+
+      Tag.string('link', attrs)
     end
   end
 end

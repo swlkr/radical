@@ -1,27 +1,10 @@
 # frozen_string_literal: true
 
 require 'rack/csrf'
+require_relative 'tag'
 
 module Radical
   class Form
-    SELF_CLOSING_TAGS = %w[
-      area
-      base
-      br
-      col
-      embed
-      hr
-      img
-      input
-      keygen
-      link
-      meta
-      param
-      source
-      track
-      wbr
-    ].freeze
-
     def initialize(options, controller)
       @options = options
       @model = options[:model]
@@ -29,28 +12,29 @@ module Radical
       @override_method = options[:method]&.upcase || (@model&.saved? ? 'PATCH' : 'POST')
       @method = %w[GET POST].include?(@override_method) ? @override_method : 'POST'
       @action = options[:action] || options[:url] || action_from(model: @model, controller: controller)
+      @tag = Tag.new
     end
 
     def text(name, attrs = {})
       attrs.merge!(type: 'text', name: name, value: @model&.public_send(name))
 
-      tag 'input', attrs
+      @tag.input attrs
     end
 
     def hidden(name, attrs = {})
       attrs.merge!(type: 'hidden', name: name, value: @model&.public_send(name))
 
-      tag 'input', attrs
+      @tag.input attrs
     end
 
     def number(name, attrs = {})
       attrs.merge!(type: 'number', name: name, value: @model&.public_send(name))
 
-      tag 'input', attrs
+      @tag.input attrs
     end
 
     def button(attrs = {}, &block)
-      tag 'button', attrs, &block
+      Tag.string 'button', attrs, &block
     end
 
     def submit(value_or_attrs = {})
@@ -63,11 +47,13 @@ module Radical
         attrs = value_or_attrs || {}
       end
 
-      tag 'input', attrs.merge('type' => 'submit')
+      Tag.string 'input', attrs.merge('type' => 'submit')
     end
 
     def open_tag
-      "<form #{html_attributes(@options.slice(:class, :style).merge(action: @action, method: @method))}>"
+      attrs = @options.slice(:class, :style).merge(action: @action, method: @method)
+
+      Tag.open_tag('form', attrs)
     end
 
     def csrf_tag
@@ -77,27 +63,14 @@ module Radical
     def rack_override_tag
       attrs = { value: @override_method, type: 'hidden', name: '_method' }
 
-      tag('input', attrs) unless %w[GET POST].include?(@override_method)
+      @tag.input(attrs) unless %w[GET POST].include?(@override_method)
     end
 
     def close_tag
-      '</form>'
+      Tag.close_tag('form')
     end
 
     private
-
-    def tag(name, attrs, &block)
-      attr_string = attrs.empty? ? '' : " #{html_attributes(attrs)}"
-      open_tag_str = "<#{name}"
-      self_closing = SELF_CLOSING_TAGS.include?(name)
-      end_tag = self_closing ? ' />' : "</#{name}>"
-
-      "#{open_tag_str}#{attr_string}#{self_closing ? '' : '>'}#{block&.call}#{end_tag}"
-    end
-
-    def html_attributes(options = {})
-      options.transform_keys(&:to_s).sort_by { |k, _| k }.map { |k, v| "#{k}=\"#{v}\"" }.join(' ')
-    end
 
     def action_from(controller:, model:)
       return if model.nil?

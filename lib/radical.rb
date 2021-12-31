@@ -7,6 +7,7 @@ require_relative 'radical/model'
 require_relative 'radical/migration'
 require_relative 'radical/routes'
 require_relative 'radical/env'
+require_relative 'radical/tag'
 
 module Radical
   def self.env
