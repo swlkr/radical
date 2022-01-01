@@ -1,7 +1,8 @@
 # typed: true
 # frozen_string_literal: true
 
-require 'rack'
+require 'rack/request'
+require 'rack/response'
 require 'sorbet-runtime'
 
 # A very naive router for radical
@@ -32,6 +33,8 @@ require 'sorbet-runtime'
 #   end
 # end
 module Radical
+  class RouteNotFound < StandardError; end
+
   class Router
     extend T::Sig
 
@@ -118,9 +121,7 @@ module Radical
         params = request.path_info.match(r.first)&.named_captures
       end
 
-      # TODO: render public/404.html?
-      # TODO: raise 404 error?
-      return Rack::Response.new('404 Not Found', 404) unless route
+      raise RouteNotFound unless route
 
       klass, method = route.last
 

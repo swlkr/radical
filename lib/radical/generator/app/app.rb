@@ -24,14 +24,13 @@ require_all(
   'routes'
 )
 
-# the main entry point into the application
-class App < Radical::App
-  routes Routes
+App ||= Radical::App.new(
+  routes: Routes,
 
-  assets do |a|
-    a.css []
-    a.js []
-  end
+  assets: {
+    css: %w[],
+    js: %w[]
+  }
+)
 
-  compile_assets if Radical.env.production?
-end
+App.compile_assets if Radical.env.production?

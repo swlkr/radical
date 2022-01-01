@@ -3,4 +3,5 @@
 require 'radical'
 
 class ModelTest < Radical::Model
+  table false
 end

@@ -22,8 +22,8 @@ module Radical
     def route
       file = File.join Dir.pwd, 'routes.rb'
       lines = File.readlines(file)
-      end_index = lines.find_index { |line| line.start_with?('end') }
-      lines.insert(end_index, "  resources :#{camel_case}")
+      index = lines.find_index { |line| line.end_with? 'Routes ||= Radical::Routes.new do' }
+      lines.insert(index + 1, "  resources :#{camel_case}")
 
       File.open(file, 'r+') do |f|
         lines.each do |line|

@@ -17,9 +17,11 @@ require_relative 'middleware/logfmt_logger'
 #
 # Example:
 #
-# class App < Radical::App
-#   root Home
-# end
+# App = Radical::App.new(
+#   routes: Radical::Routes.new do
+#     root :HomeController
+#   end
+# )
 #
 # App.call(
 #   {
@@ -30,7 +32,7 @@ require_relative 'middleware/logfmt_logger'
 #
 # Dispatches to:
 #
-# class Controller < Radical::Controller
+# class HomeController < Radical::Controller
 #   # GET /
 #   def index
 #     head :ok
@@ -38,101 +40,95 @@ require_relative 'middleware/logfmt_logger'
 # end
 module Radical
   class App
-    class << self
-      def routes(route_class)
-        @routes = route_class
-      end
+    attr_accessor :router, :routes, :assets, :session, :security_headers
+    attr_writer :serve_assets
 
-      def assets(&block)
-        @assets = Assets.new
+    def initialize(routes:, assets: {}, session: {}, security_headers: {})
+      @routes = routes
+      @router = routes.router
+      @assets = Assets.new(assets)
+      @session = session_defaults.merge(session)
+      @security_headers = security_headers
+      @serve_assets = false
+      rack_builder
+    end
 
-        block.call(@assets)
-      end
+    def compile_assets
+      @assets.compile
+    end
 
-      def compile_assets
-        @assets.compile
-      end
+    def serve_assets
+      @serve_assets = true
+    end
 
-      def serve_assets
-        @serve_assets = true
-      end
+    def call(env)
+      @app.call(env)
+    end
 
-      def security_headers(headers = {})
-        @security_headers = headers
-      end
+    private
 
-      def session(options = {})
-        defaults = {
-          path: '/',
-          secret: session_secret,
-          http_only: true,
-          same_site: :lax,
-          secure: env.production?,
-          expire_after: 2_592_000 # 30 days
-        }
+    def rack_builder
+      this = self
 
-        @session = defaults.merge(options)
-      end
+      @app ||= Rack::Builder.new do
+        use Radical::Middleware::LogfmtLogger
+        use Rack::ShowExceptions if Radical.env.development?
+        use Rack::Runtime
+        use Rack::MethodOverride
+        use Rack::ContentLength
+        use Rack::ETag
+        use Rack::Deflater
+        use Rack::Head
+        use Rack::ConditionalGet
+        use Rack::ContentType
+        use Rack::Session::Cookie, this.session
+        use Rack::Csrf, raise: Radical.env.development?, skip: this.router.routes.values.flatten.select { |a| a.is_a?(Radical::Controller) }.uniq.map(&:skip_csrf_actions).flatten(1)
+        use Radical::Flash
+        use Radical::SecurityHeaders, this.security_headers
 
-      def env
-        Env
-      end
-
-      def app
-        router = @routes.router
-        env = self.env
-        assets = @assets
-        serve_assets = @serve_assets
-        security_headers = @security_headers || {}
-        session = @session || self.session
-
-        @app ||= Rack::Builder.app do
-          use Middleware::LogfmtLogger
-          use Rack::ShowExceptions if env.development?
-          use Rack::Runtime
-          use Rack::MethodOverride
-          use Rack::ContentLength
-          use Rack::ETag
-          use Rack::Deflater
-          use Rack::Head
-          use Rack::ConditionalGet
-          use Rack::ContentType
-          use Rack::Session::Cookie, session
-          use Rack::Csrf, raise: env.development?, skip: router.routes.values.flatten.select { |a| a.is_a?(Class) }.uniq.map(&:skip_csrf_actions).flatten(1)
-          use Flash
-          use SecurityHeaders, security_headers
-
-          if serve_assets || env.development?
-            use Rack::Static, urls: ['/assets', '/public'],
-                              header_rules: [
-                                [/\.(?:css\.gz)$/, { 'Content-Type' => 'text/css', 'Content-Encoding' => 'gzip' }],
-                                [/\.(?:js\.gz)$/, { 'Content-Type' => 'application/javascript', 'Content-Encoding' => 'gzip' }],
-                                [/\.(?:css\.br)$/, { 'Content-Type' => 'text/css', 'Content-Encoding' => 'br' }],
-                                [/\.(?:js\.br)$/, { 'Content-Type' => 'application/javascript', 'Content-Encoding' => 'br' }]
-                              ]
-          end
-
-          run lambda { |rack_env|
-            begin
-              router.route(Rack::Request.new(rack_env), options: { assets: assets }).finish
-            rescue ModelNotFound
-              raise unless env.production?
-
-              Rack::Response.new('404 Not Found', 404).finish
-            end
-          }
+        if this.serve_assets || Radical.env.development?
+          use Rack::Static, urls: ['/assets', '/public'],
+                            header_rules: [
+                              [/\.(?:css\.gz)$/, { 'Content-Type' => 'text/css', 'Content-Encoding' => 'gzip' }],
+                              [/\.(?:js\.gz)$/, { 'Content-Type' => 'application/javascript', 'Content-Encoding' => 'gzip' }],
+                              [/\.(?:css\.br)$/, { 'Content-Type' => 'text/css', 'Content-Encoding' => 'br' }],
+                              [/\.(?:js\.br)$/, { 'Content-Type' => 'application/javascript', 'Content-Encoding' => 'br' }]
+                            ]
         end
-      end
 
-      def call(env)
-        app.call(env)
-      end
+        run lambda { |env|
+          begin
+            this.router.route(Rack::Request.new(env), options: { assets: this.assets }).finish
+          rescue ModelNotFound, RouteNotFound
+            raise unless Radical.env.production?
 
-      private
+            not_found_page = File.read File.join(Dir.pwd, 'public', '404.html')
 
-      def session_secret
-        @session_secret ||= (ENV['SESSION_SECRET'] || SecureRandom.hex(32))
+            Rack::Response.new(not_found_page, 404, { 'Content-Type' => 'text/html' }).finish
+          rescue StandardError
+            raise unless Radical.env.production?
+
+            server_error_page = File.read File.join(Dir.pwd, 'public', '500.html')
+
+            Rack::Response.new(server_error_page, 500, { 'Content-Type' => 'text/html' }).finish
+          end
+        }
       end
+    end
+
+    def session_defaults
+      {
+        path: '/',
+        secret: session_secret,
+        http_only: true,
+        same_site: :lax,
+        secure: Radical.env.production?,
+        expire_after: 2_592_000 # 30 days
+      }
+    end
+
+    def session_secret
+      @session_secret ||= (ENV['SESSION_SECRET'] || SecureRandom.hex(32))
     end
   end
 end

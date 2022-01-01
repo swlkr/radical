@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class Routes < Radical::Routes
+Routes ||= Radical::Routes.new do
   # root :Home
 end

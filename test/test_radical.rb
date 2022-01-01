@@ -2,19 +2,42 @@
 
 require 'minitest/autorun'
 require 'rack/test'
-require 'app'
+require 'radical'
+
+def require_all(dir)
+  Dir[File.join(__dir__, dir, '*.rb')].sort.each do |file|
+    require file
+  end
+end
+
+require_all 'controllers'
+
+Radical::Controller.prepend_view_path 'test'
 
 class RadicalTest < Minitest::Test
   include Rack::Test::Methods
 
   def app
-    App
+    @app ||= Radical::App.new(
+      routes: Radical::Routes.new do
+        root :HomeController
+        resources :TodoController
+        resources :TodoItemController
+        resources :AsController, :BController
+
+        resource :ProfileController
+
+        resources :CController do
+          resources :DController
+        end
+      end
+    )
   end
 
-  def test_returns_404_when_route_not_found
-    get '/404'
-
-    assert last_response.not_found?
+  def test_raises_404_when_route_not_found
+    assert_raises Radical::RouteNotFound do
+      get '/404'
+    end
   end
 
   def test_returns_200_when_route_is_found

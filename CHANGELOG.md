@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 # [Unreleased]
 
+- **Breaking** Break app and routes and everything
 - **Breaking** Change path helpers from `x_path` to `index_x_path` or `create_x_path` (they match the controller actions)
 - Reload model after inserting/updating
 - Somehow don't break anything but change models, controllers and views to generate with singular anyway

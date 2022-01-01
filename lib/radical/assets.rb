@@ -4,11 +4,8 @@ module Radical
   class Assets
     attr_accessor :assets_path, :compiled, :assets
 
-    def initialize
-      @assets = {
-        css: [],
-        js: []
-      }
+    def initialize(assets)
+      @assets = assets
       @compressor = :none
       @assets_path = File.join(__dir__, 'assets')
       @compiled = {}
