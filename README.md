@@ -27,15 +27,15 @@ class HomeController < Radical::Controller
   end
 end
 
-class Routes < Radical::Routes
+routes = Radical::Routes.new do
   root :HomeController
 end
 
-class App < Radical::App
-  routes Routes
-end
+app = Radical::App.new(
+  routes: routes
+)
 
-run App
+run app
 ```
 
 Install the gems and start the server
