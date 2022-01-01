@@ -10,33 +10,33 @@ class HomeController < Controller
   def index; end
 end
 
-class Routes < Radical::Routes
+routes = Radical::Routes.new do
   root :HomeController
 end
 
-class App < Radical::App
-  routes Routes
+app = Radical::App.new(
+  routes: routes
 
-  assets do |a|
-    a.prepend_assets_path '/var/app/examples/assets'
+  assets: {
+    prepend_assets_path: '/var/app/examples/assets',
 
-    a.css %w[
+    css: %w[
       a.css
       b.css
     ]
 
-    a.js %w[
+    js: %w[
       a.js
       b.js
     ]
 
-    a.brotli
-  end
+    brotli: true
+  }
+)
 
-  if Radical.env.production?
-    compile_assets
-    serve_assets # this is just for example, you would probably have nginx/caddy or something serve the assets in production
-  end
+if Radical.env.production?
+  app.compile_assets
+  app.serve_assets # this is just for example, you would probably have nginx/caddy or something serve the assets in production
 end
 
-run App
+run app
