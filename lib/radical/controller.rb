@@ -165,6 +165,11 @@ module Radical
       [path, query_string].compact.join('')
     end
 
+    def csp_nonce
+      @request.env['radical.nonce']
+    end
+
+
     private
 
     def url_prefix
@@ -218,14 +223,14 @@ module Radical
     end
 
     def script_tag(src, attrs)
-      defaults = { 'type' => 'application/javascript', 'src' => src }
+      defaults = { 'type' => 'application/javascript', 'src' => src, 'defer' => '', 'nonce' => csp_nonce }
       attrs.merge!(defaults)
 
       Tag.string('script', attrs)
     end
 
     def link_tag(href, attrs)
-      defaults = { 'type' => 'text/css', 'rel' => 'stylesheet', 'href' => href }
+      defaults = { 'type' => 'text/css', 'rel' => 'stylesheet', 'href' => href, 'nonce' => csp_nonce }
       attrs.merge!(defaults)
 
       Tag.string('link', attrs)
