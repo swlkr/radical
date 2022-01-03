@@ -169,6 +169,9 @@ module Radical
       @request.env['radical.nonce']
     end
 
+    def tag
+      Tag.new
+    end
 
     private
 
