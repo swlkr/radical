@@ -10,15 +10,15 @@ module Radical
     end
 
     def test_tag_with_no_attrs
-      assert_equal '<div></div>', Tag.string('div')
+      assert_equal '<div></div>', @tag.string('div')
     end
 
     def test_button
-      assert_equal '<button></button>', Tag.string('button')
+      assert_equal '<button></button>', @tag.string('button')
     end
 
     def test_button_with_block
-      actual = Tag.string('button', {}) { 'push me' }
+      actual = @tag.string('button', {}) { @output = String.new; return 'push me' }
       assert_equal('<button>push me</button>', actual)
     end
 

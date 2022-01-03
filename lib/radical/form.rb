@@ -34,7 +34,7 @@ module Radical
     end
 
     def button(attrs = {}, &block)
-      Tag.string 'button', attrs, &block
+      @tag.string 'button', attrs, &block
     end
 
     def submit(value_or_attrs = {})
@@ -47,13 +47,13 @@ module Radical
         attrs = value_or_attrs || {}
       end
 
-      Tag.string 'input', attrs.merge('type' => 'submit')
+      @tag.string 'input', attrs.merge('type' => 'submit')
     end
 
     def open_tag
       attrs = @options.slice(:class, :style).merge(action: @action, method: @method)
 
-      Tag.open_tag('form', attrs)
+      @tag.open_tag('form', attrs)
     end
 
     def csrf_tag
@@ -67,7 +67,7 @@ module Radical
     end
 
     def close_tag
-      Tag.close_tag('form')
+      @tag.close_tag('form')
     end
 
     private

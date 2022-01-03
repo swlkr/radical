@@ -9,14 +9,14 @@ module Radical
     end
 
     def method_missing(name, *args, &block)
-      self.class.string(name, *args, &block)
+      string(name, *args, &block)
     end
 
     def respond_to_missing?
       true
     end
 
-    def self.open_tag(name, attrs)
+    def open_tag(name, attrs)
       attr_string = attrs.empty? ? '' : " #{attribute_string(attrs)}"
       open_tag_str = "<#{name}"
       self_closing = SELF_CLOSING_TAGS.include?(name)
@@ -24,7 +24,7 @@ module Radical
       "#{open_tag_str}#{attr_string}#{self_closing ? '' : '>'}"
     end
 
-    def self.close_tag(name)
+    def close_tag(name)
       self_closing = SELF_CLOSING_TAGS.include?(name)
 
       if self_closing
@@ -34,12 +34,32 @@ module Radical
       end
     end
 
-    def self.attribute_string(attributes = {})
+    def attribute_string(attributes = {})
       attributes.transform_keys(&:to_s).sort_by { |k, _| k }.map { |k, v| "#{k}=\"#{v}\"" }.join(' ')
     end
 
-    def self.string(name, attrs = {}, &block)
-      "#{open_tag(name, attrs)}#{yield if block}#{close_tag(name)}"
+    def string(name, attrs = {}, &block)
+      if block
+        capture(block) do
+          emit open_tag(name, attrs)
+          yield
+          emit close_tag(name)
+        end
+      else
+        "#{open_tag(name, attrs)}#{yield if block}#{close_tag(name)}"
+      end
+    end
+
+    def emit(tag)
+      @output = String.new if @output.nil?
+      @output << tag.to_s
+    end
+
+    def capture(block)
+      @output = eval('@output', block.binding) || String.new
+      yield
+
+      @output
     end
   end
 end

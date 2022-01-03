@@ -220,7 +220,7 @@ module Radical
     end
 
     def capture(block)
-      @output = eval '_buf', block.binding
+      @output = eval '@output', block.binding
       yield
       @output
     end
@@ -229,14 +229,14 @@ module Radical
       defaults = { 'type' => 'application/javascript', 'src' => src, 'defer' => '', 'nonce' => csp_nonce }
       attrs.merge!(defaults)
 
-      Tag.string('script', attrs)
+      Tag.new.string('script', attrs)
     end
 
     def link_tag(href, attrs)
       defaults = { 'type' => 'text/css', 'rel' => 'stylesheet', 'href' => href, 'nonce' => csp_nonce }
       attrs.merge!(defaults)
 
-      Tag.string('link', attrs)
+      Tag.new.string('link', attrs)
     end
   end
 end

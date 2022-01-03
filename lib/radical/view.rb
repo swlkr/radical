@@ -36,7 +36,7 @@ module Radical
       end
 
       def template(filename)
-        Tilt.new(filename, engine_class: CaptureEngine, escape_html: true)
+        Tilt.new(filename, engine_class: CaptureEngine, escape_html: true, bufvar: '@output')
       end
 
       def path(path = nil)
