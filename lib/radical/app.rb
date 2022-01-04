@@ -99,7 +99,7 @@ module Radical
         run lambda { |env|
           begin
             this.router.route(Rack::Request.new(env), options: { assets: this.assets }).finish
-          rescue ModelNotFound, RouteNotFound
+          rescue ModelNotFound, RouteNotFound, NotFound
             raise unless Radical.env.production?
 
             not_found_page = File.read File.join(Dir.pwd, 'public', '404.html')

@@ -34,6 +34,7 @@ require 'sorbet-runtime'
 # end
 module Radical
   class RouteNotFound < StandardError; end
+  class NotFound < StandardError; end
 
   class Router
     extend T::Sig
