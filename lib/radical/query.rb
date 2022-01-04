@@ -193,6 +193,10 @@ module Radical
       limit(1).first.nil?
     end
 
+    def pluck(*columns)
+      select(columns.join(', ')).all.map { |r| columns.map { |c| r.send(c) } }
+    end
+
     private
 
     def quote(str)
