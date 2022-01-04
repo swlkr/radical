@@ -53,6 +53,9 @@ module Radical
             str = [(placeholders.empty? ? nil : "#{k} in (#{placeholders})"), (v.any?(&:nil?) ? "#{k} is null" : nil)].compact.join(' or ')
             @parts[:where] << "(#{str})"
             @params += v1
+          when Model
+            @parts[:where] << "#{k}_id = ?"
+            @params << v.id
           when nil
             @parts[:where] << "#{k} is null"
           else
