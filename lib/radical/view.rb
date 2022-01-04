@@ -32,7 +32,9 @@ module Radical
       def view_path(name, controller = nil)
         parts = parts(name, controller)
 
-        "#{File.join(@_views_path || '.', 'views', *parts)}.erb"
+        root = @_views_path || (Radical.env.test? ? 'test' : '.')
+
+        "#{File.join(root, 'views', *parts)}.erb"
       end
 
       def template(filename)

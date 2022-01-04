@@ -1,2 +1,2 @@
 #!/bin/bash
-docker run --rm -it -v $(pwd):/var/app radical
+docker run --rm -it -v $(pwd):/var/app -e "RADICAL_ENV=test" radical

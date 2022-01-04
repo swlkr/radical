@@ -12,8 +12,6 @@ end
 
 require_all 'controllers'
 
-Radical::Controller.prepend_view_path 'test'
-
 class RadicalTest < Minitest::Test
   include Rack::Test::Methods
 
