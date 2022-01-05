@@ -13,4 +13,4 @@ jobs:
     - name: Build docker image
       run: docker build -t radical .
     - name: Run tests
-      run: docker run --rm -v $(pwd):/var/app radical
+      run: docker run --rm -v $(pwd):/var/app -e 'RADICAL_ENV=test' radical
